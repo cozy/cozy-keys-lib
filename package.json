@@ -4,12 +4,13 @@
   "description": "Interactions between cozy-keys and a bitwarden server",
   "main": "src/index.js",
   "scripts": {
-    "submodule:init": "git submodule init",
-    "submodule:update": "git submodule update",
+    "init:submodule": "git submodule init && git submodule update",
+    "init": "npm run init:submodule",
     "build:jslib:compile": "cd '@bitwarden/jslib' && cp -f ../../tsconfig.json . && npm install && npm run build",
-    "build:jslib:copy": "mkdir -p 'src/@bitwarden' && mv '@bitwarden/jslib/dist/src' 'src/@bitwarden/jslib'",
+    "build:jslib:copy": "mkdir -p 'src/@bitwarden' && rm -rf 'src/@bitwarden/jslib' && mv -f '@bitwarden/jslib/dist/src' 'src/@bitwarden/jslib'",
     "build:jslib": "npm run build:jslib:compile && npm run build:jslib:copy",
-    "build": "npm run build:jslib",
+    "build:browser": "webpack",
+    "build": "npm run build:jslib && npm run build:browser",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,11 +25,25 @@
   "homepage": "https://github.com/cozy/cozy-keys-lib#readme",
   "devDependencies": {
     "@babel/cli": "7.4.4",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
     "babel-plugin-rewire": "1.2.0",
-    "babel-preset-cozy-app": "^1.6.0"
+    "babel-preset-cozy-app": "^1.6.0",
+    "webpack": "^4.39.2",
+    "webpack-bundle-analyzer": "^3.4.1",
+    "webpack-cli": "^3.3.7"
   },
   "files": [
     "src",
     "src/@bitwarden"
-  ]
+  ],
+  "dependencies": {
+    "big-integer": "^1.6.44",
+    "lunr": "^2.3.6",
+    "node-forge": "^0.8.5",
+    "tldjs": "^2.3.1",
+    "zxcvbn": "^4.4.2"
+  }
 }

@@ -35,6 +35,8 @@ import WebPlatformUtilsService from './WebPlatformUtilsService'
 import HtmlStorageService from './HtmlStorageService'
 import MemoryStorageService from './MemoryStorageService'
 
+import * as CozyUtils from './CozyUtils'
+
 Utils.init()
 
 /**
@@ -62,27 +64,11 @@ class WebVaultClient {
    */
   constructor(instance_or_email, { urls, locale }) {
     this.instance = instance_or_email
-    if (this.instance.match('@')) {
-      this.email = this.instance
-    } else {
-      this.email = this.getEmail()
-    }
+    this.email = CozyUtils.getEmail(instance_or_email)
     this.urls = urls || {} //TODO
     this.locale = locale || 'en'
     this.init()
     this.cipherTypes = CipherType
-  }
-
-  /**
-   * Get user (fake) email
-   * This email is generated with the instance URL
-   * @param {string} instance - URL like https://xx.mycozy.cloud
-   * @return {string} email
-   */
-  getEmail() {
-    if (this.email) return this.email
-    const instance = new URL(this.instance.toLowercase())
-    return 'me@' + instance.hostname
   }
 
   /*

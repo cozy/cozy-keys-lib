@@ -16,7 +16,6 @@ await vault.sync()
 const all = vault.getAllDecrypted({type: vault.cipherTypes.Login})
 ```
 
-
 ## Dev
 
 ```sh
