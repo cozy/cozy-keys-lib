@@ -8,8 +8,8 @@ import manifest from '../package.json'
 
 import swal from 'sweetalert'
 
-import { DeviceType } from '@bitwarden/jslib/enums/deviceType'
-import { Utils } from '@bitwarden/jslib/misc/utils'
+import { DeviceType } from './@bitwarden/jslib/enums/deviceType'
+import { Utils } from './@bitwarden/jslib/misc/utils'
 
 export default class WebPlatformUtilsService {
   constructor(i18nService, messagingService) {

@@ -4,6 +4,12 @@
   "description": "Interactions between cozy-keys and a bitwarden server",
   "main": "src/index.js",
   "scripts": {
+    "submodule:init": "git submodule init",
+    "submodule:update": "git submodule update",
+    "build:jslib:compile": "cd '@bitwarden/jslib' && cp -f ../../tsconfig.json . && npm install && npm run build",
+    "build:jslib:copy": "mkdir -p 'src/@bitwarden' && mv '@bitwarden/jslib/dist/src' 'src/@bitwarden/jslib'",
+    "build:jslib": "npm run build:jslib:compile && npm run build:jslib:copy",
+    "build": "npm run build:jslib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -11,7 +17,7 @@
     "url": "https://github.com/cozy/cozy-keys-lib.git"
   },
   "author": "Cozy",
-  "license": "AGPL-3.0-or-later",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/cozy/cozy-keys-lib/issues"
   },
@@ -21,7 +27,8 @@
     "babel-plugin-rewire": "1.2.0",
     "babel-preset-cozy-app": "^1.6.0"
   },
-  "dependencies": {
-    "@bitwarden/jslib": "https://github.com/bitwarden/jslib/"
-  }
+  "files": [
+    "src",
+    "src/@bitwarden"
+  ]
 }
