@@ -8,9 +8,10 @@ import manifest from '../package.json'
 
 import swal from 'sweetalert'
 
-import StrippedWebPlatformUtilsService from './WebPlatformUtilsService'
+import StrippedWebPlatformUtilsService from './StrippedWebPlatformUtilsService'
 
 import { Utils } from './@bitwarden/jslib/misc/utils'
+import { DeviceType } from './@bitwarden/jslib/enums/deviceType'
 
 export default class WebPlatformUtilsService extends StrippedWebPlatformUtilsService {
   constructor(i18nService, messagingService) {

@@ -4,7 +4,7 @@
  * Gnu Public License 3.0 (GPL 3.0)
  */
 
-import { ConstantsService } from '@bitwarden/jslib/services'
+import { ConstantsService } from './@bitwarden/jslib/services/constants.service'
 
 export default class HtmlStorageService {
   localStorageKeys = new Set([

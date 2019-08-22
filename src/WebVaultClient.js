@@ -15,7 +15,7 @@ import { I18nService } from './@bitwarden/jslib/services/i18n.service'
 // import { ImportService } from './@bitwarden/jslib/services/import.service'
 import { LockService } from './@bitwarden/jslib/services/lock.service'
 import { NoopMessagingService } from './@bitwarden/jslib/services/noopMessaging.service'
-import { NotificationsService } from './@bitwarden/jslib/services/notifications.service'
+//import { NotificationsService } from './@bitwarden/jslib/services/notifications.service'
 import { PasswordGenerationService } from './@bitwarden/jslib/services/passwordGeneration.service'
 import { SearchService } from './@bitwarden/jslib/services/search.service'
 import { SettingsService } from './@bitwarden/jslib/services/settings.service'
@@ -28,6 +28,12 @@ import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoF
 import { CipherType } from './@bitwarden/jslib/enums/cipherType'
 
 import { Cipher } from './@bitwarden/jslib/models/domain/cipher'
+import { Login } from './@bitwarden/jslib/models/domain/login'
+import { Field } from './@bitwarden/jslib/models/domain/field'
+import Domain from './@bitwarden/jslib/models/domain/domainBase'
+
+import { CipherView } from './@bitwarden/jslib/models/view/cipherView'
+
 import { EmailRequest } from './@bitwarden/jslib/models/request/emailRequest'
 import { EmailTokenRequest } from './@bitwarden/jslib/models/request/emailTokenRequest'
 
@@ -62,13 +68,18 @@ class WebVaultClient {
    * @param {string} options.urls.api - URL of the api server
    * @param {string} options.urls.events - URL of the events server
    */
-  constructor(instance_or_email, { urls, locale }) {
+  constructor(instance_or_email, { urls, locale }={}) {
     this.instance = instance_or_email
     this.email = CozyUtils.getEmail(instance_or_email)
     this.urls = urls || {} //TODO
     this.locale = locale || 'en'
     this.init()
     this.cipherTypes = CipherType
+    this.Cipher = Cipher
+    this.CipherView = CipherView
+    this.Login = Login
+    this.Domain = Domain
+    this.Field = Field
   }
 
   /*
@@ -179,14 +190,15 @@ class WebVaultClient {
     //   i18nService,
     //   collectionService
     // )
-    const notificationsService = new NotificationsService(
-      userService,
-      syncService,
-      appIdService,
-      apiService,
-      lockService,
-      async () => messagingService.send('logout', { expired: true })
-    )
+    //const notificationsService = new NotificationsService(
+    //  userService,
+    //  syncService,
+    //  appIdService,
+    //  apiService,
+    //  lockService,
+    //  async () => messagingService.send('logout', { expired: true })
+    //)
+    const notificationsService = null
     const environmentService = new EnvironmentService(
       apiService,
       storageService,
@@ -202,6 +214,7 @@ class WebVaultClient {
     this.collectionService = collectionService
     this.passwordGenerationService = passwordGenerationService
     this.containerService = containerService
+    this.lockService = lockService
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
   }
@@ -240,7 +253,7 @@ class WebVaultClient {
    */
   async login(masterPassword) {
     await this.initFinished
-    await this.authService.logIn(this.email, masterPassword)
+    return await this.authService.logIn(this.email, masterPassword)
   }
 
   /**
@@ -282,7 +295,7 @@ class WebVaultClient {
    */
   async sync() {
     await this.initFinished
-    this.syncService.fullSync()
+    return await this.syncService.fullSync()
   }
 
   /**
@@ -380,11 +393,10 @@ class WebVaultClient {
   }
 
   /**
-   * Save a new or modified (decrypted) cipher to the server
-   * @param {CipherView} - cipher to save
+   * Save a new or modified (encrypted) cipher to the server
+   * @param {Cipher} - cipher to save
    */
-  async saveCipher(cipherView) {
-    const cipher = await this.encrypt(cipherView)
+  async saveCipher(cipher) {
     return this.cipherService.saveWithServer(cipher)
   }
 
@@ -435,8 +447,10 @@ class WebVaultClient {
    * @param {object} decryptedData
    * @return {Cipher}
    */
-  async createNewCipher(decryptedData) {
-    return new Cipher(decryptedData, false)
+  async createNewCipher(decryptedData, originalCipher=null) {
+    const orgId = decryptedData.organizationId
+    const key = await (orgId ? this.cryptoService.getKey(orgId) : this.cryptoService.getKey())
+    return this.cipherService.encrypt(decryptedData, key, originalCipher)
   }
 
   /**

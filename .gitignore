@@ -1,4 +1,8 @@
 src/@bitwarden
+dist/cozy-keys.js
+dist/cozy-keys.js.map
+dist/keys.html
+
 
 # Logs
 logs
