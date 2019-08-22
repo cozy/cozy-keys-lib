@@ -60,7 +60,6 @@ export default class StrippedWebPlatformUtilsService {
   }
 
   isEdge() {
-    return false
     return this.getDevice() === DeviceType.EdgeBrowser
   }
 

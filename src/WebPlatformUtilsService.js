@@ -20,10 +20,6 @@ export default class WebPlatformUtilsService extends StrippedWebPlatformUtilsSer
     this.messagingService = messagingService
   }
 
-  isEdge() {
-    return this.getDevice() === DeviceType.EdgeBrowser
-  }
-
   analyticsId() {
     console.log('No analytics, please fix the caller')
     return ''

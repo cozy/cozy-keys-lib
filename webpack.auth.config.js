@@ -17,7 +17,7 @@ module.exports = {
       'tldjs': path.resolve(__dirname, 'src/null.js'),
       'lunr': path.resolve(__dirname, 'src/null.js'),
       'zxcvbn': path.resolve(__dirname, 'src/null.js'),
-      'node-forge': path.resolve(__dirname, 'src/null.js'),
+      //'node-forge': path.resolve(__dirname, 'src/null.js'),
       'url': path.resolve(__dirname, 'src/null.js'),
       'path': path.resolve(__dirname, 'src/null.js'),
       'wordlist': path.resolve(__dirname, 'src/null.js'),
