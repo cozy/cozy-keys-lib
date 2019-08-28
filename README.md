@@ -9,21 +9,19 @@ This is component of the [Cozy Cloud](https://cozy.io) platform and not an compo
 ## Usage
 
 ```javascript
-const instance = 'https://myuser.mycozy.cloud'
-vault = WebVaultClient(instance)
-await vault.unlock(masterPassword)
-await vault.sync()
-const all = vault.getAllDecrypted({type: vault.cipherTypes.Login})
+const instance = "https://myuser.mycozy.cloud";
+vault = WebVaultClient(instance);
+await vault.unlock(masterPassword);
+await vault.sync();
+const all = vault.getAllDecrypted({ type: vault.cipherTypes.Login });
 ```
 
 ## Dev
 
 ```sh
-yarn 
-yarn run init
-yarn run build:jslib
+yarn
+yarn setup:submodule
+yarn build:jslib
 
-yarn run build:keys
-# or
-yarn run build:auth
+yarn build:keys
 ```
