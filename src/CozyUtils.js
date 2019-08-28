@@ -11,11 +11,11 @@ import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoF
  */
 export function getEmail(instance) {
   if (instance.match('@')) {
-      return instance.toString()
+    return instance.toString()
   } else {
     const url = new URL(instance.toString().toLowerCase())
     return 'me@' + url.hostname
-  }  
+  }
 }
 
 /**
@@ -26,11 +26,21 @@ export function getEmail(instance) {
  * @param {integer} kdfIterations
  * @return {string} hashed password as base64 string
  */
-export async function getHashedPassword(instance_or_email, masterPassword, kdf, kdfIterations) {
+export async function getHashedPassword(
+  instance_or_email,
+  masterPassword,
+  kdf,
+  kdfIterations
+) {
   const email = getEmail(instance_or_email)
   const cryptoService = getLightCryptoService()
-  const key = await cryptoService.makeKey(masterPassword, email, kdf, kdfIterations);
-  const hashedPassword = await cryptoService.hashPassword(masterPassword, key);
+  const key = await cryptoService.makeKey(
+    masterPassword,
+    email,
+    kdf,
+    kdfIterations
+  )
+  const hashedPassword = await cryptoService.hashPassword(masterPassword, key)
   return hashedPassword
 }
 
@@ -41,7 +51,7 @@ export async function getHashedPassword(instance_or_email, masterPassword, kdf, 
  */
 function getLightCryptoService() {
   const storageService = null
-  const secureStorageService = null 
+  const secureStorageService = null
   const platformUtilsService = new StrippedWebPlatformUtilsService()
   const cryptoFunctionService = new WebCryptoFunctionService(
     window,

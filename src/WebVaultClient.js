@@ -70,14 +70,13 @@ class WebVaultClient {
    * @param {string} options.urls.api - URL of the api server
    * @param {string} options.urls.events - URL of the events server
    */
-  constructor(instance_or_email, { urls, locale }={}) {
+  constructor(instance_or_email, { urls, locale } = {}) {
     this.instance = instance_or_email
     this.email = CozyUtils.getEmail(instance_or_email)
     this.urls = urls || {} //TODO
     this.locale = locale || 'en'
     this.init()
     window.webVaultClient = this
-
   }
 
   /*
@@ -454,9 +453,11 @@ class WebVaultClient {
    * @param {object} decryptedData
    * @return {Cipher}
    */
-  async createNewCipher(decryptedData, originalCipher=null) {
+  async createNewCipher(decryptedData, originalCipher = null) {
     const orgId = decryptedData.organizationId
-    const key = await (orgId ? this.cryptoService.getKey(orgId) : this.cryptoService.getKey())
+    const key = await (orgId
+      ? this.cryptoService.getKey(orgId)
+      : this.cryptoService.getKey())
     return this.cipherService.encrypt(decryptedData, key, originalCipher)
   }
 

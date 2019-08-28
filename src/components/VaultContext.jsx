@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import WebVaultClient from '../WebVaultClient'
 
 const VaultContext = React.createContext()
@@ -10,13 +11,12 @@ class VaultProvider extends React.Component {
   }
 
   componentDidMount() {
-    console.log('vault provider instance', this.props.instance)
     const client = new WebVaultClient(this.props.instance)
-    
+
     const onLockEvent = async () => {
       const locked = await client.isLocked()
       if (locked != this.state.locked) {
-        this.setState({client, locked})
+        this.setState({ client, locked })
       }
     }
     client.on('unlock', onLockEvent)
@@ -24,7 +24,8 @@ class VaultProvider extends React.Component {
     client.on('login', onLockEvent)
 
     this.setState({
-      client, locked: this.state.locked
+      client,
+      locked: this.state.locked
     })
   }
 
@@ -36,6 +37,10 @@ class VaultProvider extends React.Component {
       </VaultContext.Provider>
     ) : null
   }
+}
+
+VaultProvider.propTypes = {
+  instance: PropTypes.string.isRequired
 }
 
 const withVaultClient = BaseComponent => {
