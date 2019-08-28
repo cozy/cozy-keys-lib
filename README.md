@@ -19,6 +19,11 @@ const all = vault.getAllDecrypted({type: vault.cipherTypes.Login})
 ## Dev
 
 ```sh
-yarn install
-yarn build
+yarn 
+yarn run init
+yarn run build:jslib
+
+yarn run build:keys
+# or
+yarn run build:auth
 ```

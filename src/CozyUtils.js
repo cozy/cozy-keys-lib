@@ -13,8 +13,8 @@ export function getEmail(instance) {
   if (instance.match('@')) {
       return instance
   } else {
-    const instance = new URL(this.instance.toLowercase())
-    return 'me@' + instance.hostname
+    const url = new URL(instance.toLowercase())
+    return 'me@' + url.hostname
   }  
 }
 

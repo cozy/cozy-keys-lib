@@ -1,5 +1,5 @@
 import React from 'react'
-import VaultClient from '../VaultClient'
+import WebVaultClient from '../WebVaultClient'
 
 const VaultContext = React.createContext()
 
@@ -9,11 +9,17 @@ class VaultProvider extends React.Component {
   }
 
   componentDidMount() {
-    const client = new VaultClient(this.props.url)
-    client.onUnlock = () => {
+    console.log('vault provider instance', this.props.instance)
+    const client = new WebVaultClient(this.props.instance)
+    
+    const onEvent = () => {
       console.log('force update')
       this.forceUpdate()
     }
+    client.on('unlock', onEvent)
+    client.on('lock', onEvent)
+    client.on('login', onEvent)
+
     this.setState({
       client
     })

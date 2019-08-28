@@ -21,7 +21,7 @@ class UnlockForm extends React.Component {
 
   unlockVault() {
     const { vaultClient } = this.props
-    vaultClient.unlock()
+    vaultClient.unlock(this.state.password)
   }
 
   render() {

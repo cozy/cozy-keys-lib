@@ -1,3 +1,5 @@
+import MicroEE from 'microee'
+
 import { Utils } from './@bitwarden/jslib/misc/utils'
 
 import { ApiService } from './@bitwarden/jslib/services/api.service'
@@ -217,6 +219,7 @@ class WebVaultClient {
     this.lockService = lockService
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
+    this.initFinished.then(() => this.emit('init', this))
   }
 
   /**
@@ -244,7 +247,9 @@ class WebVaultClient {
    */
   async lock() {
     await this.initFinished
-    return this.lockService.lock()
+    const lock = await this.lockService.lock()
+    this.emit('lock', this)
+    return lock
   }
 
   /**
@@ -253,7 +258,9 @@ class WebVaultClient {
    */
   async login(masterPassword) {
     await this.initFinished
-    return await this.authService.logIn(this.email, masterPassword)
+    const login = await this.authService.logIn(this.email, masterPassword)
+    this.emit('login', this)
+    return login
   }
 
   /**
@@ -284,7 +291,9 @@ class WebVaultClient {
       if (storedKeyHash == keyHash) {
         await this.cryptoService.setKey(key)
       }
+      this.emit('unlock_no_login', this)
     }
+    this.emit('unlock', this)
     return true
   }
 
@@ -295,7 +304,9 @@ class WebVaultClient {
    */
   async sync() {
     await this.initFinished
-    return await this.syncService.fullSync()
+    const sync = await this.syncService.fullSync()
+    this.emit('sync', this)
+    return sync
   }
 
   /**
@@ -514,5 +525,7 @@ class WebVaultClient {
     await this.sync()
   } /* eslint-enable no-unreachable */
 }
+
+MicroEE.mixin(WebVaultClient)
 
 export default WebVaultClient
