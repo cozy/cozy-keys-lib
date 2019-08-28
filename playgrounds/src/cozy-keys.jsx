@@ -12,6 +12,14 @@ import { withClient } from 'cozy-client'
 
 import { VaultProvider, VaultUnlocker } from '../../transpiled'
 
+
+let localConfig = { }
+try {
+  localConfig = require('../local.config.json')
+} catch(e) {
+  // nothing
+}
+
 const reducer = combineReducers({
   cozy: client.reducer()
 })
@@ -19,10 +27,10 @@ const reducer = combineReducers({
 const store = createStore(reducer)
 
 function VaultComponent({ client }) {
-  //const instance = client.getStackClient().uri
-  const instance = "eric.daspet@survol.fr"
+  const uri = client.getStackClient().uri
+  const cfg = localConfig.keysInstance
   return (
-    <VaultProvider instance={instance}>
+    <VaultProvider instance={cfg || uri}>
       <Sprite />
       <VaultUnlocker>
         <div>Unlocked</div>

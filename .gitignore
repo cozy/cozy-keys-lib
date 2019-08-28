@@ -4,6 +4,7 @@ dist/cozy-keys.js.map
 dist/keys.html
 transpiled/
 playgrounds/dist
+playgrounds/local.config.json
 
 # Logs
 logs

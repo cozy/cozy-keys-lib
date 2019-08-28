@@ -11,9 +11,9 @@ import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoF
  */
 export function getEmail(instance) {
   if (instance.match('@')) {
-      return instance
+      return instance.toString()
   } else {
-    const url = new URL(instance.toLowercase())
+    const url = new URL(instance.toString().toLowerCase())
     return 'me@' + url.hostname
   }  
 }

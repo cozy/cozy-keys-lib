@@ -76,12 +76,8 @@ class WebVaultClient {
     this.urls = urls || {} //TODO
     this.locale = locale || 'en'
     this.init()
-    this.cipherTypes = CipherType
-    this.Cipher = Cipher
-    this.CipherView = CipherView
-    this.Login = Login
-    this.Domain = Domain
-    this.Field = Field
+    window.webVaultClient = this
+
   }
 
   /*

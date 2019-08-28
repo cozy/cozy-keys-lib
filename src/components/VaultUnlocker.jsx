@@ -11,8 +11,8 @@ const locales = {
 }
 
 const VaultUnlocker = ({ children }) => {
-  const { client } = React.useContext(VaultContext)
-  return !client.isLocked() ? children : (
+  const { client, locked } = React.useContext(VaultContext)
+  return (!locked) ? children : (
     <UnlockForm />
   )
 }

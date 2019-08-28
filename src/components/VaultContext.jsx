@@ -5,30 +5,33 @@ const VaultContext = React.createContext()
 
 class VaultProvider extends React.Component {
   state = {
-    client: null
+    client: null,
+    locked: true
   }
 
   componentDidMount() {
     console.log('vault provider instance', this.props.instance)
     const client = new WebVaultClient(this.props.instance)
     
-    const onEvent = () => {
-      console.log('force update')
-      this.forceUpdate()
+    const onLockEvent = async () => {
+      const locked = await client.isLocked()
+      if (locked != this.state.locked) {
+        this.setState({client, locked})
+      }
     }
-    client.on('unlock', onEvent)
-    client.on('lock', onEvent)
-    client.on('login', onEvent)
+    client.on('unlock', onLockEvent)
+    client.on('lock', onLockEvent)
+    client.on('login', onLockEvent)
 
     this.setState({
-      client
+      client, locked: this.state.locked
     })
   }
 
   render() {
     const { client } = this.state
     return client ? (
-      <VaultContext.Provider value={{ client }}>
+      <VaultContext.Provider value={this.state}>
         {this.props.children}
       </VaultContext.Provider>
     ) : null
