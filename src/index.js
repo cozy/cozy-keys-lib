@@ -1,5 +1,3 @@
-import WebVaultClient from './WebVaultClient'
-import CozyUtils from './CozyUtils'
-
-export default WebVaultClient
-export { WebVaultClient, CozyUtils }
+export { WebVaultClient } from './WebVaultClient'
+export { CozyUtils } from './CozyUtils'
+export { VaultContext, VaultProvider } from './components/VaultContext'

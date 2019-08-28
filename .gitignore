@@ -2,7 +2,8 @@ src/@bitwarden
 dist/cozy-keys.js
 dist/cozy-keys.js.map
 dist/keys.html
-
+transpiled/
+playgrounds/dist
 
 # Logs
 logs
@@ -65,3 +66,6 @@ typings/
 
 # next.js build output
 .next
+
+# Mac
+.DS_Store

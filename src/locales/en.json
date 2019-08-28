@@ -1,0 +1,11 @@
+{
+    "unlock": {
+        "title": "Login",
+        "subtitle": "Unlock your cozy to proceed",
+        "label": "Password",
+        "show": "show",
+        "hide": "hide",
+        "abort": "Leave",
+        "unlock": "Unlock"
+    }
+}

@@ -5,15 +5,17 @@
   "main": "src/index.js",
   "scripts": {
     "init:submodule": "git submodule init && git submodule update",
-    "init": "npm run init:submodule",
+    "init": "yarn run init:submodule",
     "build:jslib:compile": "cd '@bitwarden/jslib' && cp -f ../../tsconfig.json . && npm install && npm run build",
     "build:jslib:copy": "mkdir -p 'src/@bitwarden' && rm -rf 'src/@bitwarden/jslib' && mv -f '@bitwarden/jslib/dist/src' 'src/@bitwarden/jslib'",
-    "build:jslib": "npm run build:jslib:compile && npm run build:jslib:copy",
+    "build:jslib": "yarn build:jslib:compile && yarn run build:jslib:copy",
     "build:browser:auth": "webpack --config webpack.auth.config.js",
     "build:browser:keys": "webpack --config webpack.keys.config.js",
-    "build:browser": "npm run build:browser:auth",
-    "build": "npm run build:jslib && npm run build:browser",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:browser": "yarn run build:browser:auth",
+    "build:keys": "env BABEL_ENV=transpilation yarn babel src/ --out-dir transpiled && yarn run copy-files",
+    "copy-files": "cp -rf src/locales transpiled/",
+    "build": "yarn run build:keys && yarn run build:browser",
+    "test": "jest --verbose"
   },
   "repository": {
     "type": "git",
@@ -30,18 +32,25 @@
     "@babel/core": "^7.5.5",
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "cozy-ui": "22.12.0",
+    "enzyme-to-json": "3.3.5",
+    "jest": "24.8.0",
+    "react": "^16.8.3",
     "babel-loader": "^8.0.6",
     "babel-plugin-rewire": "1.2.0",
     "babel-preset-cozy-app": "^1.6.0",
+    "babel-plugin-inline-react-svg": "^1.1.0",
     "webpack": "^4.39.2",
     "webpack-bundle-analyzer": "^3.4.1",
     "webpack-cli": "^3.3.7"
   },
   "files": [
     "src",
-    "src/@bitwarden"
+    "src/@bitwarden",
+    "transpiled"
   ],
   "dependencies": {
+    "@babel/runtime": "^7.5.4",
     "@aspnet/signalr": "^1.1.4",
     "@aspnet/signalr-protocol-msgpack": "^1.1.0",
     "big-integer": "^1.6.44",
@@ -49,6 +58,11 @@
     "node-forge": "^0.8.5",
     "sweetalert": "^2.1.2",
     "tldjs": "^2.3.1",
-    "zxcvbn": "^4.4.2"
+    "zxcvbn": "^4.4.2",
+    "lodash": "4.17.15",
+    "prop-types": "^15.7.2"
+  },
+  "peerDependencies": {
+    "cozy-ui": "^22.12.0"
   }
 }
