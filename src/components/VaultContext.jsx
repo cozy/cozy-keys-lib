@@ -28,6 +28,8 @@ class VaultProvider extends React.Component {
       client,
       locked: this.state.locked
     })
+
+    onLockEvent()
   }
 
   render() {
