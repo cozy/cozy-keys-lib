@@ -11,7 +11,8 @@ class VaultProvider extends React.Component {
   }
 
   componentDidMount() {
-    const client = new WebVaultClient(this.props.instance)
+    const unsafeStorage = this.props.unsafeStorage
+    const client = new WebVaultClient(this.props.instance, {unsafeStorage})
 
     const onLockEvent = async () => {
       const locked = await client.isLocked()
@@ -40,7 +41,8 @@ class VaultProvider extends React.Component {
 }
 
 VaultProvider.propTypes = {
-  instance: PropTypes.string.isRequired
+  instance: PropTypes.string.isRequired,
+  unsafeStorage: PropTypes.bool
 }
 
 const withVaultClient = BaseComponent => {

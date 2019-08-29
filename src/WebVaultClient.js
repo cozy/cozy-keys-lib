@@ -70,12 +70,12 @@ class WebVaultClient {
    * @param {string} options.urls.api - URL of the api server
    * @param {string} options.urls.events - URL of the events server
    */
-  constructor(instance_or_email, { urls, locale } = {}) {
+  constructor(instance_or_email, { urls, locale, unsafeStorage } = {}) {
     this.instance = instance_or_email
     this.email = CozyUtils.getEmail(instance_or_email)
     this.urls = urls || {} //TODO
     this.locale = locale || 'en'
-    this.init()
+    this.init({unsafeStorage})
     window.webVaultClient = this
   }
 
@@ -83,7 +83,7 @@ class WebVaultClient {
    * @private
    * Initialize the undelying libraries
    */
-  init() {
+  init({unsafeStorage}) {
     const messagingService = new NoopMessagingService()
     const i18nService = new I18nService(this.locale, './locales')
     const platformUtilsService = new WebPlatformUtilsService(
@@ -98,7 +98,7 @@ class WebVaultClient {
     const secureStorageService = new MemoryStorageService()
     const cryptoService = new CryptoService(
       storageService,
-      secureStorageService,
+      unsafeStorage ? storageService : secureStorageService,
       cryptoFunctionService
     )
     const tokenService = new TokenService(storageService)
