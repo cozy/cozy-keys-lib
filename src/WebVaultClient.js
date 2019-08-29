@@ -456,8 +456,8 @@ class WebVaultClient {
   async createNewCipher(decryptedData, originalCipher = null) {
     const orgId = decryptedData.organizationId
     const key = await (orgId
-      ? this.cryptoService.getKey(orgId)
-      : this.cryptoService.getKey())
+      ? this.cryptoService.getOrgKey(orgId)
+      : this.cryptoService.getEncKey())
     return this.cipherService.encrypt(decryptedData, key, originalCipher)
   }
 
