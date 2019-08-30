@@ -9,11 +9,11 @@ This is component of the [Cozy Cloud](https://cozy.io) platform and not an compo
 ## Usage
 
 ```javascript
-const instance = "https://myuser.mycozy.cloud";
-vault = WebVaultClient(instance);
-await vault.unlock(masterPassword);
-await vault.sync();
-const all = vault.getAllDecrypted({ type: vault.cipherTypes.Login });
+const instance = 'https://myuser.mycozy.cloud'
+vault = WebVaultClient(instance)
+await vault.unlock(masterPassword)
+await vault.sync()
+const all = vault.getAllDecrypted({ type: vault.cipherTypes.Login })
 ```
 
 ## Dev
@@ -25,3 +25,9 @@ yarn build:jslib
 
 yarn build:keys
 ```
+
+## Testing in an app
+
+cozy-keys-lib relies on cryptographic APIs that are only enabled on secure locations, such as pages served with https or `localhost`. This means that running it on `http://cozy.tools:8080` will not work.
+
+It may be possible to force your browser to consider this location as secure anyway and enable the crypto APIs. In Chrome for example, go to `chrome://flags`, find the "Insecure origins treated as secure" section and add `http://cozy.tools:8080`.
