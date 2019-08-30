@@ -5,31 +5,49 @@ import WebVaultClient from '../WebVaultClient'
 const VaultContext = React.createContext()
 
 class VaultProvider extends React.Component {
-  state = {
-    client: null,
-    locked: true
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      client: null,
+      locked: true
+    }
+
+    this.updateLockedState = this.updateLockedState.bind(this)
+    this.setupClient = this.setupClient.bind(this)
   }
 
   componentDidMount() {
-    const unsafeStorage = this.props.unsafeStorage
-    const client = new WebVaultClient(this.props.instance, {unsafeStorage})
-
-    const onLockEvent = async () => {
-      const locked = await client.isLocked()
-      if (locked != this.state.locked) {
-        this.setState({ client, locked })
-      }
+    if (this.props.instance) {
+      this.setupClient()
     }
-    client.on('unlock', onLockEvent)
-    client.on('lock', onLockEvent)
-    client.on('login', onLockEvent)
+  }
 
-    this.setState({
-      client,
-      locked: this.state.locked
-    })
+  async updateLockedState() {
+    const { client } = this.state
+    const locked = await client.isLocked()
+    if (locked != this.state.locked) {
+      this.setState({ locked })
+    }
+  }
 
-    onLockEvent()
+  setupClient() {
+    const unsafeStorage = this.props.unsafeStorage
+    const client = new WebVaultClient(this.props.instance, { unsafeStorage })
+
+    this.setState(
+      {
+        client,
+        locked: true
+      },
+      () => {
+        client.on('unlock', this.updateLockedState)
+        client.on('lock', this.updateLockedState)
+        client.on('login', this.updateLockedState)
+
+        this.updateLockedState()
+      }
+    )
   }
 
   render() {
