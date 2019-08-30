@@ -23,7 +23,9 @@ const reducer = combineReducers({
 
 const store = createStore(reducer)
 
-const setToWindow = client => { window.vaultClient = client }
+const setToWindow = client => {
+  window.vaultClient = client
+}
 
 function VaultComponent({ client }) {
   const uri = client.getStackClient().uri

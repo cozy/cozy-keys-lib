@@ -11,7 +11,6 @@ import swal from 'sweetalert'
 import StrippedWebPlatformUtilsService from './StrippedWebPlatformUtilsService'
 
 import { Utils } from './@bitwarden/jslib/misc/utils'
-import { DeviceType } from './@bitwarden/jslib/enums/deviceType'
 
 export default class WebPlatformUtilsService extends StrippedWebPlatformUtilsService {
   constructor(i18nService, messagingService) {

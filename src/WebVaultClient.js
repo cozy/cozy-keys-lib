@@ -29,13 +29,6 @@ import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoF
 
 import { CipherType } from './@bitwarden/jslib/enums/cipherType'
 
-import { Cipher } from './@bitwarden/jslib/models/domain/cipher'
-import { Login } from './@bitwarden/jslib/models/domain/login'
-import { Field } from './@bitwarden/jslib/models/domain/field'
-import Domain from './@bitwarden/jslib/models/domain/domainBase'
-
-import { CipherView } from './@bitwarden/jslib/models/view/cipherView'
-
 import { EmailRequest } from './@bitwarden/jslib/models/request/emailRequest'
 import { EmailTokenRequest } from './@bitwarden/jslib/models/request/emailTokenRequest'
 
@@ -75,7 +68,8 @@ class WebVaultClient {
     this.email = CozyUtils.getEmail(instance_or_email)
     this.urls = urls || {} //TODO
     this.locale = locale || 'en'
-    this.init({unsafeStorage})
+    this.cipherTypes = CipherType
+    this.init({ unsafeStorage })
     window.webVaultClient = this
   }
 
@@ -83,7 +77,7 @@ class WebVaultClient {
    * @private
    * Initialize the undelying libraries
    */
-  init({unsafeStorage}) {
+  init({ unsafeStorage }) {
     const messagingService = new NoopMessagingService()
     const i18nService = new I18nService(this.locale, './locales')
     const platformUtilsService = new WebPlatformUtilsService(
@@ -335,15 +329,35 @@ class WebVaultClient {
   }
 
   /**
+   * Get Data from a cipher
+   * @param {Cipher} cipher
+   * @return {CipherData} decrypted data
+   */
+  async getData(cipher) {
+    this.attachToGlobal()
+    const userId = this.userService.getUserId()
+    return cipher.toCipherData(userId)
+  }
+
+  /**
    * Get all data from the local vault and decrypt them
+   *
+   * If provided a type of cipher or an uri, will only return
+   * matching ciphers.
    *
    * @param {object} options - optional
    * @param {integer} options.type - type of data to get, see `cipherTypes`
+   * @param {string} options.uri - uri of the remote service
    * @return {[CipherView]} decrypted ciphers, filtered by type if requested
    */
-  async getAllDecrypted({ type } = {}) {
-    const all = await this.cipherService.getAll({ type })
-    return Promise.all(all.map(cipher => this.decrypt(cipher)))
+  async getAllDecrypted({ type, uri } = {}) {
+    if (uri) {
+      const all = await this.cipherService.getAllDecryptedForUrl(uri)
+      return type ? all.filter(c => c.type == type) : all
+    } else {
+      const all = await this.getAll({ type })
+      return Promise.all(all.map(cipher => this.decrypt(cipher)))
+    }
   }
 
   /**
@@ -352,6 +366,54 @@ class WebVaultClient {
    */
   async getAllDecryptedLogins() {
     return this.getAllDecrypted({ type: this.cipherTypes.Login })
+  }
+
+  /**
+   * Get all decrypted ciphers for a set of match
+   * @param {object} match
+   * @param {CipherType} match.type - type of cipher
+   * @param {string|RegExp} match.name - name of cipher
+   * @param {string|RegExp} match.username - a login.username to match
+   * @param {string|RegExp} match.uri - an login.uri to match
+   * @return {CipherView[]}
+   */
+  async getAllDecryptedFor({ type, uri, username, name }) {
+    const all = await this.getAllDecrypted({ type, uri })
+    return all.filter(view => {
+      if (username) {
+        if (!view.login) return false
+        if (!this.weakMatch(view.login.username, username)) return false
+      }
+      if (name) {
+        if (!this.weakMatch(view.name, name)) return false
+      }
+      return true
+    })
+  }
+
+  /**
+   * @private
+   * test if two parameters match
+   * @param {object} source
+   * @param {string|number|boolean|RegExp|Array} compare
+   * @return boolean
+   */
+  weakMatch(source, compare) {
+    if (compare === null) return true
+    if (source === null) return false
+    if (compare instanceof Array) {
+      return compare.find(c => this.weakMatch(source, c))
+    } else if (compare instanceof RegExp) {
+      return source.match(compare)
+    } else if (typeof compare == 'boolean') {
+      return source === compare
+    } else if (typeof compare == 'number') {
+      return source === compare
+    } else if (typeof compare == 'string') {
+      return source == compare
+    } else {
+      throw `Could not compare with a ${typeof compare} not in {string|number|boolean|RegExp|Array}`
+    }
   }
 
   /**
