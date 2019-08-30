@@ -48,6 +48,10 @@ class VaultProvider extends React.Component {
         this.updateLockedState()
       }
     )
+
+    if (this.props.setClient) {
+      this.props.setClient(client)
+    }
   }
 
   render() {
@@ -62,7 +66,8 @@ class VaultProvider extends React.Component {
 
 VaultProvider.propTypes = {
   instance: PropTypes.string.isRequired,
-  unsafeStorage: PropTypes.bool
+  unsafeStorage: PropTypes.bool,
+  setClient: PropTypes.func
 }
 
 const withVaultClient = BaseComponent => {

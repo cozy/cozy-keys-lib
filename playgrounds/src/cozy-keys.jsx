@@ -23,11 +23,13 @@ const reducer = combineReducers({
 
 const store = createStore(reducer)
 
+const setToWindow = client => { window.vaultClient = client }
+
 function VaultComponent({ client }) {
   const uri = client.getStackClient().uri
   const cfg = localConfig.keysInstance
   return (
-    <VaultProvider instance={cfg || uri}>
+    <VaultProvider instance={cfg || uri} setClient={setToWindow}>
       <Sprite />
       <VaultUnlocker>
         <div>Unlocked</div>
