@@ -9,9 +9,6 @@
     "build:jslib:compile": "cd '@bitwarden/jslib' && cp -f ../../tsconfig.json . && npm install && npm run build",
     "build:jslib:copy": "mkdir -p 'src/@bitwarden' && rm -rf 'src/@bitwarden/jslib' && mv -f '@bitwarden/jslib/dist/src' 'src/@bitwarden/jslib'",
     "build:jslib": "yarn build:jslib:compile && yarn run build:jslib:copy",
-    "build:browser:auth": "webpack --config webpack.auth.config.js",
-    "build:browser:keys": "webpack --config webpack.keys.config.js",
-    "build:browser": "yarn run build:browser:auth",
     "build:keys": "env BABEL_ENV=transpilation yarn babel src/ --out-dir transpiled && yarn run copy-files",
     "copy-files": "cp -rf src/locales transpiled/",
     "build": "yarn run build:keys && yarn run build:browser",
@@ -43,10 +40,7 @@
     "babel-preset-cozy-app": "^1.6.0",
     "enzyme-to-json": "3.3.5",
     "eslint-config-cozy-app": "^1.2.2",
-    "jest": "24.8.0",
-    "webpack": "^4.39.2",
-    "webpack-bundle-analyzer": "^3.4.1",
-    "webpack-cli": "^3.3.7"
+    "jest": "24.8.0"
   },
   "files": [
     "src",
@@ -64,8 +58,8 @@
     "microee": "^0.0.6",
     "node-forge": "^0.8.5",
     "prop-types": "^15.7.2",
-    "react-dom": "^16.9.0",
     "react": "^16.8.3",
+    "react-dom": "^16.9.0",
     "sweetalert": "^2.1.2",
     "tldjs": "^2.3.1",
     "zxcvbn": "^4.4.2"
