@@ -8,6 +8,7 @@ addons:
       - deadsnakes
     packages:
       - g++-4.8
+      - python3.5
 cache:
   yarn: true
   directories:
