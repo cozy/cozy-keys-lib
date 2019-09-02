@@ -50,7 +50,7 @@ Utils.init()
  * vault = WebVaultClient(instance)
  * await vault.unlock(masterPassword)
  * await vault.sync()
- * const all = vault.getAllDecrypted({type: vault.cipherTypes.Login})
+ * const all = vault.getAllDecrypted({type: CipherType.Login})
  * ```
  */
 class WebVaultClient {
@@ -70,7 +70,6 @@ class WebVaultClient {
     this.email = CozyUtils.getEmail(instance_or_email)
     this.urls = urls || {} //TODO
     this.locale = locale || 'en'
-    this.cipherTypes = CipherType
     this.init({ unsafeStorage })
     window.webVaultClient = this
   }
@@ -304,7 +303,7 @@ class WebVaultClient {
    * Get all (encrypted) data from the local vault
    *
    * @param {object} options - optional
-   * @param {integer} options.type - type of data to get, see `cipherTypes`
+   * @param {integer} options.type - type of data to get, see `CipherType`
    * @return {[Cipher]} all ciphers in the vault, filtered by type if requested
    */
   async getAll({ type } = {}) {
@@ -317,7 +316,7 @@ class WebVaultClient {
    * @return {[Cipher]} all ciphers of type "Login" in the vault
    */
   async getAllLogins() {
-    return this.getAll({ type: this.cipherTypes.Login })
+    return this.getAll({ type: CipherType.Login })
   }
 
   /**
@@ -348,7 +347,7 @@ class WebVaultClient {
    * matching ciphers.
    *
    * @param {object} options - optional
-   * @param {integer} options.type - type of data to get, see `cipherTypes`
+   * @param {integer} options.type - type of data to get, see `CipherType`
    * @param {string} options.uri - uri of the remote service
    * @return {[CipherView]} decrypted ciphers, filtered by type if requested
    */
@@ -367,7 +366,7 @@ class WebVaultClient {
    * @return {[CipherView]} decrypted ciphers of type "Login"
    */
   async getAllDecryptedLogins() {
-    return this.getAllDecrypted({ type: this.cipherTypes.Login })
+    return this.getAllDecrypted({ type: CipherType.Login })
   }
 
   /**
