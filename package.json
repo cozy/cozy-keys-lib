@@ -15,7 +15,7 @@
     "watch": "yarn watch:keys",
     "watch:keys": "env BABEL_ENV=transpilation yarn babel src/ --out-dir transpiled --watch",
     "lint": "eslint 'src/**/*.{js,jsx}' 'playgrounds/src/**/*.{js,jsx}'",
-    "test": "jest"
+    "test": "NODE_OPTIONS=\"--max-old-space-size=8192\" jest"
   },
   "repository": {
     "type": "git",
