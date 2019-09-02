@@ -1,5 +1,7 @@
 import MicroEE from 'microee'
 
+import eq from 'lodash.eq'
+
 import { Utils } from './@bitwarden/jslib/misc/utils'
 
 import { ApiService } from './@bitwarden/jslib/services/api.service'
@@ -405,14 +407,8 @@ class WebVaultClient {
       return compare.find(c => this.weakMatch(source, c))
     } else if (compare instanceof RegExp) {
       return source.match(compare)
-    } else if (typeof compare == 'boolean') {
-      return source === compare
-    } else if (typeof compare == 'number') {
-      return source === compare
-    } else if (typeof compare == 'string') {
-      return source == compare
     } else {
-      throw `Could not compare with a ${typeof compare} not in {string|number|boolean|RegExp|Array}`
+      return eq(source, compare)
     }
   }
 
