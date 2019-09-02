@@ -15,12 +15,20 @@ import { translate } from 'cozy-ui/transpiled/react/I18n'
 import { withVaultClient } from './VaultContext'
 
 class UnlockForm extends React.Component {
-  state = {
-    password: '',
-    error: null
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      password: '',
+      error: null
+    }
+
+    this.unlockVault = this.unlockVault.bind(this)
   }
 
-  async unlockVault() {
+  async unlockVault(event) {
+    event.preventDefault()
+
     const { vaultClient } = this.props
     try {
       this.setState({ error: null })
@@ -34,50 +42,52 @@ class UnlockForm extends React.Component {
     const { t } = this.props
     const { password, error } = this.state
     return (
-      <Modal
-        mobileFullscreen
-        className="u-bg-dodgerBlue"
-        closeBtnColor={palette['white']}
-      >
-        <ModalContent
-          fixed
-          className="u-flex u-flex-column u-flex-items-center u-flex-grow-1 u-bg-dodgerBlue u-bdw-0"
+      <form onSubmit={this.unlockVault}>
+        <Modal
+          mobileFullscreen
+          className="u-bg-dodgerBlue"
+          closeBtnColor={palette['white']}
         >
-          <div className="u-mt-3">
-            <CloudIcon />
-          </div>
-          <MainTitle className="u-white">{t('unlock.title')}</MainTitle>
-          <Text className="u-mb-1-half u-white">{t('unlock.subtitle')}</Text>
+          <ModalContent
+            fixed
+            className="u-flex u-flex-column u-flex-items-center u-flex-grow-1 u-bg-dodgerBlue u-bdw-0"
+          >
+            <div className="u-mt-3">
+              <CloudIcon />
+            </div>
+            <MainTitle className="u-white">{t('unlock.title')}</MainTitle>
+            <Text className="u-mb-1-half u-white">{t('unlock.subtitle')}</Text>
 
-          <Field
-            id="idField"
-            label={t('unlock.label')}
-            type="password"
-            value={password}
-            error={!!error}
-            onChange={e => this.setState({ password: e.currentTarget.value })}
-            fullwidth
-            className="u-w-100 u-white"
-            secondaryComponent={({ visible }) =>
-              visible ? (
-                <Icon aria-label={t('unlock.show')} icon="eye-closed" />
-              ) : (
-                <Icon icon="eye" aria-label={t('unlock.hide')} />
-              )
-            }
-            labelProps={{ className: 'u-white' }}
-          />
-        </ModalContent>
-        <ModalFooter className="u-flex u-flex-justify-end">
-          <Button label={t('unlock.abort')} className="u-mr-half u-w-100-t" />
-          <Button
-            label={t('unlock.unlock')}
-            theme="secondary"
-            className="u-w-100-t u-dodgerBlue"
-            onClick={this.unlockVault.bind(this)}
-          />
-        </ModalFooter>
-      </Modal>
+            <Field
+              id="idField"
+              label={t('unlock.label')}
+              type="password"
+              value={password}
+              error={!!error}
+              onChange={e => this.setState({ password: e.currentTarget.value })}
+              fullwidth
+              className="u-w-100 u-white"
+              secondaryComponent={({ visible }) =>
+                visible ? (
+                  <Icon aria-label={t('unlock.show')} icon="eye-closed" />
+                ) : (
+                  <Icon icon="eye" aria-label={t('unlock.hide')} />
+                )
+              }
+              labelProps={{ className: 'u-white' }}
+            />
+          </ModalContent>
+          <ModalFooter className="u-flex u-flex-justify-end">
+            <Button label={t('unlock.abort')} className="u-mr-half u-w-100-t" />
+            <Button
+              label={t('unlock.unlock')}
+              theme="secondary"
+              className="u-w-100-t u-dodgerBlue"
+              onClick={this.unlockVault}
+            />
+          </ModalFooter>
+        </Modal>
+      </form>
     )
   }
 }
