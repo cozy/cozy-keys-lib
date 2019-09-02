@@ -1,6 +1,10 @@
 language: node_js
 node_js:
   - '10'
+addons:
+  apt:
+    packages:
+      - libsecret-1-0
 cache:
   yarn: true
   directories:
