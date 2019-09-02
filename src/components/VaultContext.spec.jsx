@@ -41,7 +41,7 @@ describe('VaultProvider', () => {
 })
 
 describe('withVaultClient', () => {
-  fit('should inject vaultClient as a prop', () => {
+  it('should inject vaultClient as a prop', () => {
     const ChildComponent = () => <div />
     const ChildWithClient = withVaultClient(ChildComponent)
 
