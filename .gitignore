@@ -1,7 +1,5 @@
 src/@bitwarden
-dist/cozy-keys.js
-dist/cozy-keys.js.map
-dist/keys.html
+dist/
 transpiled/
 playgrounds/dist
 playgrounds/local.config.json
