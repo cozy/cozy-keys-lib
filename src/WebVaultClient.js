@@ -336,7 +336,7 @@ class WebVaultClient {
    */
   async getData(cipher) {
     this.attachToGlobal()
-    const userId = this.userService.getUserId()
+    const userId = await this.userService.getUserId()
     return cipher.toCipherData(userId)
   }
 
