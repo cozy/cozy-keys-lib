@@ -5,7 +5,7 @@
   "main": "transpiled/index.js",
   "scripts": {
     "setup:submodule": "git submodule init && git submodule update",
-    "setup": "yarn run init:submodule",
+    "setup": "yarn run setup:submodule",
     "build:jslib:backup": "mv ./node_modules ./node_modules.back",
     "build:jslib:restore": "mv ./node_modules.back ./node_modules",
     "build:jslib:compile": "cd '@bitwarden/jslib' && cp -f ../../tsconfig.json . && npm install && npm run build",
