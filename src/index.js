@@ -1,6 +1,6 @@
-export { WebVaultClient } from './WebVaultClient'
-export { CozyUtils } from './CozyUtils'
-export { CipherType } from './CipherType'
+export { default as WebVaultClient } from './WebVaultClient'
+export { default as CozyUtils } from './CozyUtils'
+export { default as CipherType } from './CipherType'
 
 export {
   VaultContext,
