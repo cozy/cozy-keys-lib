@@ -1,6 +1,8 @@
 import MicroEE from 'microee'
 
 import eq from 'lodash/eq'
+import get from 'lodash/get'
+import orderBy from 'lodash/orderBy'
 
 import { Utils } from './@bitwarden/jslib/misc/utils'
 
@@ -390,6 +392,32 @@ class WebVaultClient {
       }
       return true
     })
+  }
+
+  /**
+   * Search a cipher, first by id
+   * otherwise by a search forwarded to `getAllDecryptedFor`
+   * and get the first one in the order asked
+   * @param {integer} id - uuid of a cipher
+   * @param {object} search - as described in `getAllDecryptedFor`
+   * @param {Array|function|string} sort - given to lodash.sortBy 
+   * @return {Cipher} encrypted cipher
+   */
+  async getByIdOrSearch(id, search, sort) {
+    if (id) {
+      const cipher = await this.get(id)
+      if (cipher) return cipher
+    }
+    if (search) {
+      const all = await this.getAllDecryptedFor(search)
+      const first = orderBy(all, sort)[0]
+      const id = get(first, 'id')
+      if (id) {
+        const searchedCipher = await this.get(id)
+        if (searchedCipher) return searchedCipher
+      }
+    }
+    return null
   }
 
   /**
