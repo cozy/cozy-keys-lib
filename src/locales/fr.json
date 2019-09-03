@@ -1,0 +1,11 @@
+{
+    "unlock": {
+        "title": "Authentification",
+        "subtitle": "Déverouiller votre cozy pour continuer",
+        "label": "Mot de passe",
+        "show": "afficher",
+        "hide": "masquer",
+        "abort": "Quitter",
+        "unlock": "Dévérouiller"
+    }
+}

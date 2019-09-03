@@ -1,0 +1,4 @@
+[submodule "@bitwarden/jslib"]
+	path = @bitwarden/jslib
+	url = https://github.com/bitwarden/jslib.git
+ 
