@@ -269,6 +269,7 @@ class WebVaultClient {
     const storedKeyHash = await this.cryptoService.getKeyHash()
     if (!isAuthed || !kdf || !storedKeyHash) {
       await this.login(masterPassword)
+      this.sync()
     } else {
       const key = await this.cryptoService.makeKey(
         masterPassword,
@@ -400,7 +401,7 @@ class WebVaultClient {
    * and get the first one in the order asked
    * @param {integer} id - uuid of a cipher
    * @param {object} search - as described in `getAllDecryptedFor`
-   * @param {Array|function|string} sort - given to lodash.sortBy 
+   * @param {Array|function|string} sort - given to lodash.sortBy
    * @return {Cipher} encrypted cipher
    */
   async getByIdOrSearch(id, search, sort) {

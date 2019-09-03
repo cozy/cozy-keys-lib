@@ -1,3 +1,1 @@
-export {
-  CipherType as default
-} from './@bitwarden/jslib/services/cipher.service'
+export { CipherType as default } from './@bitwarden/jslib/enums/cipherType'
