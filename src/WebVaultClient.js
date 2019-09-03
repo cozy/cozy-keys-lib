@@ -1,6 +1,6 @@
 import MicroEE from 'microee'
 
-import eq from 'lodash.eq'
+import eq from 'lodash/eq'
 
 import { Utils } from './@bitwarden/jslib/misc/utils'
 

@@ -1,9 +1,6 @@
 import WebVaultClient from './WebVaultClient'
 
 describe('WebVaultClient', () => {
-  it('should succeed', () => {
-    expect(true).toBe(true)
-  })
 
   describe('weakMatch', () => {
     let client
