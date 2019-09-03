@@ -11,7 +11,6 @@ import swal from 'sweetalert'
 import StrippedWebPlatformUtilsService from './StrippedWebPlatformUtilsService'
 
 import { Utils } from './@bitwarden/jslib/misc/utils'
-import { DeviceType } from './@bitwarden/jslib/enums/deviceType'
 
 export default class WebPlatformUtilsService extends StrippedWebPlatformUtilsService {
   constructor(i18nService, messagingService) {
@@ -21,7 +20,8 @@ export default class WebPlatformUtilsService extends StrippedWebPlatformUtilsSer
   }
 
   analyticsId() {
-    console.log('No analytics, please fix the caller')
+    // eslint-disable-next-line no-console
+    console.warn('No analytics, please fix the caller')
     return ''
   }
 
@@ -232,7 +232,7 @@ export default class WebPlatformUtilsService extends StrippedWebPlatformUtilsSer
         // Security exception may be thrown by some browsers.
         doc.execCommand('copy')
       } catch (e) {
-        // tslint:disable-next-line
+        // eslint-disable-next-line no-console
         console.warn('Copy to clipboard failed.', e)
       } finally {
         copyEl.removeChild(textarea)
