@@ -333,17 +333,6 @@ class WebVaultClient {
   }
 
   /**
-   * Get Data from a cipher
-   * @param {Cipher} cipher
-   * @return {CipherData} decrypted data
-   */
-  async getData(cipher) {
-    this.attachToGlobal()
-    const userId = await this.userService.getUserId()
-    return cipher.toCipherData(userId)
-  }
-
-  /**
    * Get all data from the local vault and decrypt them
    *
    * If provided a type of cipher or an uri, will only return
