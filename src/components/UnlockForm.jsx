@@ -11,6 +11,7 @@ import Button from 'cozy-ui/transpiled/react/Button'
 import CloudIcon from '../../assets/icon-cozy-security.svg'
 import palette from 'cozy-ui/transpiled/react/palette'
 import { translate } from 'cozy-ui/transpiled/react/I18n'
+import cx from 'classnames'
 
 import { withVaultClient } from './VaultContext'
 
@@ -21,7 +22,7 @@ class UnlockForm extends React.Component {
     this.state = {
       password: '',
       unlocking: false,
-      error: null
+      error: false
     }
 
     this.unlockVault = this.unlockVault.bind(this)
@@ -63,7 +64,11 @@ class UnlockForm extends React.Component {
               <CloudIcon />
             </div>
             <MainTitle className="u-white">{t('unlock.title')}</MainTitle>
-            <Text className="u-mb-1-half u-white">{t('unlock.subtitle')}</Text>
+            <Text
+              className={cx('u-mb-1-half', error ? 'u-yourPink' : 'u-white')}
+            >
+              {error ? t('unlock.error') : t('unlock.subtitle')}
+            </Text>
 
             <Field
               id="idField"
