@@ -20,27 +20,34 @@ class UnlockForm extends React.Component {
 
     this.state = {
       password: '',
+      unlocking: false,
       error: null
     }
 
     this.unlockVault = this.unlockVault.bind(this)
+    this.handleVaultUnlock = this.handleVaultUnlock.bind(this)
   }
 
-  async unlockVault(event) {
+  handleVaultUnlock(event) {
     event.preventDefault()
+    this.unlockVault()
+  }
 
+  async unlockVault() {
     const { vaultClient } = this.props
+    this.setState({ unlocking: true, error: null })
     try {
-      this.setState({ error: null })
       await vaultClient.unlock(this.state.password)
     } catch (error) {
       this.setState({ error })
+    } finally {
+      this.setState({ unlocking: false })
     }
   }
 
   render() {
     const { t } = this.props
-    const { password, error } = this.state
+    const { password, error, unlocking } = this.state
     return (
       <form onSubmit={this.unlockVault}>
         <Modal
@@ -83,7 +90,8 @@ class UnlockForm extends React.Component {
               label={t('unlock.unlock')}
               theme="secondary"
               className="u-w-100-t u-dodgerBlue"
-              onClick={this.unlockVault}
+              onClick={this.handleVaultUnlock}
+              busy={unlocking}
             />
           </ModalFooter>
         </Modal>
