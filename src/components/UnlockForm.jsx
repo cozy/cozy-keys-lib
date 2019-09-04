@@ -53,19 +53,24 @@ class UnlockForm extends React.Component {
       <form onSubmit={this.unlockVault}>
         <Modal
           mobileFullscreen
-          className="u-bg-dodgerBlue"
+          className="u-bg-primaryColor"
           closeBtnColor={palette['white']}
         >
           <ModalContent
             fixed
-            className="u-flex u-flex-column u-flex-items-center u-flex-grow-1 u-bg-dodgerBlue u-bdw-0"
+            className="u-flex u-flex-column u-flex-items-center u-flex-grow-1 u-bg-primaryColor u-bdw-0"
           >
             <div className="u-mt-3">
               <CloudIcon />
             </div>
-            <MainTitle className="u-white">{t('unlock.title')}</MainTitle>
+            <MainTitle className="u-primaryContrastTextColor">
+              {t('unlock.title')}
+            </MainTitle>
             <Text
-              className={cx('u-mb-1-half', error ? 'u-yourPink' : 'u-white')}
+              className={cx(
+                'u-mb-1-half',
+                error ? 'u-yourPink' : 'u-primaryContrastTextColor'
+              )}
             >
               {error ? t('unlock.error') : t('unlock.subtitle')}
             </Text>
@@ -78,7 +83,7 @@ class UnlockForm extends React.Component {
               error={!!error}
               onChange={e => this.setState({ password: e.currentTarget.value })}
               fullwidth
-              className="u-w-100 u-white"
+              className="u-w-100 u-primaryContrastTextColor"
               secondaryComponent={({ visible }) =>
                 visible ? (
                   <Icon aria-label={t('unlock.show')} icon="eye-closed" />
@@ -94,7 +99,7 @@ class UnlockForm extends React.Component {
             <Button
               label={t('unlock.unlock')}
               theme="secondary"
-              className="u-w-100-t u-dodgerBlue"
+              className="u-w-100-t u-primaryColor"
               onClick={this.handleVaultUnlock}
               busy={unlocking}
             />
