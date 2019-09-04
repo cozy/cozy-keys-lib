@@ -1,11 +1,12 @@
 {
-    "unlock": {
-        "title": "Authentification",
-        "subtitle": "Déverouiller votre cozy pour continuer",
-        "label": "Mot de passe",
-        "show": "afficher",
-        "hide": "masquer",
-        "abort": "Quitter",
-        "unlock": "Dévérouiller"
-    }
+  "unlock": {
+    "title": "Authentification",
+    "subtitle": "Déverouiller votre Cozy pour continuer",
+    "error": "Mot de passe incorrect, essayer à nouveau",
+    "label": "Mot de passe",
+    "show": "afficher",
+    "hide": "masquer",
+    "abort": "Quitter",
+    "unlock": "Déverouiller"
+  }
 }
