@@ -12,7 +12,7 @@ const locales = {
 
 const VaultUnlocker = ({ children }) => {
   const { locked } = React.useContext(VaultContext)
-  return !locked ? children : <UnlockForm />
+  return locked ? <UnlockForm /> : children
 }
 
 export default withLocales(locales)(VaultUnlocker)
