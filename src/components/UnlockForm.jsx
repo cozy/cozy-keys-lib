@@ -47,7 +47,7 @@ class UnlockForm extends React.Component {
   }
 
   render() {
-    const { t } = this.props
+    const { t, onDismiss } = this.props
     const { password, error, unlocking } = this.state
     return (
       <form onSubmit={this.unlockVault}>
@@ -55,6 +55,7 @@ class UnlockForm extends React.Component {
           mobileFullscreen
           className="u-bg-primaryColor"
           closeBtnColor={palette['white']}
+          dismissAction={onDismiss}
         >
           <ModalContent
             fixed
@@ -95,7 +96,11 @@ class UnlockForm extends React.Component {
             />
           </ModalContent>
           <ModalFooter className="u-flex u-flex-justify-end">
-            <Button label={t('unlock.abort')} className="u-mr-half u-w-100-t" />
+            <Button
+              onClick={onDismiss}
+              label={t('unlock.abort')}
+              className="u-mr-half u-w-100-t"
+            />
             <Button
               label={t('unlock.unlock')}
               theme="secondary"
@@ -112,7 +117,8 @@ class UnlockForm extends React.Component {
 
 UnlockForm.propTypes = {
   vaultClient: PropTypes.object.isRequired,
-  t: PropTypes.func.isRequired
+  t: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func.isRequired
 }
 
 export default withVaultClient(translate()(UnlockForm))
