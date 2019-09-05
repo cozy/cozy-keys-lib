@@ -10,9 +10,9 @@ const locales = {
   fr: localesFr
 }
 
-const VaultUnlocker = ({ children }) => {
+const VaultUnlocker = ({ children, onDismiss }) => {
   const { locked } = React.useContext(VaultContext)
-  return locked ? <UnlockForm /> : children
+  return locked ? <UnlockForm onDismiss={onDismiss} /> : children
 }
 
 export default withLocales(locales)(VaultUnlocker)
