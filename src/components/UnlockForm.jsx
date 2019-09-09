@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Modal, {
   ModalContent,
   ModalFooter
-} from 'cozy-ui/transpiled/react/modal'
+} from 'cozy-ui/transpiled/react/Modal'
 import { MainTitle, Text } from 'cozy-ui/transpiled/react/Text'
 import Icon from 'cozy-ui/transpiled/react/Icon'
 import Field from 'cozy-ui/transpiled/react/Field'
