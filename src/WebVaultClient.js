@@ -251,6 +251,7 @@ class WebVaultClient {
   async login(masterPassword) {
     await this.initFinished
     const login = await this.authService.logIn(this.email, masterPassword)
+    await this.sync()
     this.emit('login', this)
     return login
   }
@@ -269,7 +270,6 @@ class WebVaultClient {
     const storedKeyHash = await this.cryptoService.getKeyHash()
     if (!isAuthed || !kdf || !storedKeyHash) {
       await this.login(masterPassword)
-      this.sync()
     } else {
       const key = await this.cryptoService.makeKey(
         masterPassword,
