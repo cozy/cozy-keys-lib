@@ -220,7 +220,9 @@ class WebVaultClient {
    * @private
    */
   attachToGlobal() {
-    this.containerService.attachToGlobal(Utils.global)
+    // Utils.global.bitwardenContainerService is used by the bitwarden jslib to decrypt data. It is important that it is set to the current instance before running any code that involves crypto, especially when there are multiple WebVaultCLient instances on the page.
+    // There are legitimate use cases for creating multiple client instances over the lifetime of a page. For example, the client can be created by the VaultContext component, and this component could be mounted and unmounted several times by a react app.
+    Utils.global.bitwardenContainerService = this.containerService
   }
 
   /**
@@ -229,6 +231,7 @@ class WebVaultClient {
    * @return {boolean}
    */
   async isLocked() {
+    this.attachToGlobal()
     const isAuthed = await this.userService.isAuthenticated()
     const isLocked = this.lockService.isLocked()
     return !isAuthed || isLocked
@@ -238,6 +241,7 @@ class WebVaultClient {
    * Lock the vault, forget the key and master password
    */
   async lock() {
+    this.attachToGlobal()
     await this.initFinished
     const lock = await this.lockService.lock()
     this.emit('lock', this)
@@ -249,6 +253,7 @@ class WebVaultClient {
    * for future use
    */
   async login(masterPassword) {
+    this.attachToGlobal()
     await this.initFinished
     const login = await this.authService.logIn(this.email, masterPassword)
     await this.sync()
@@ -344,6 +349,7 @@ class WebVaultClient {
    * @return {[CipherView]} decrypted ciphers, filtered by type if requested
    */
   async getAllDecrypted({ type, uri } = {}) {
+    this.attachToGlobal()
     if (uri) {
       const all = await this.cipherService.getAllDecryptedForUrl(uri)
       return type ? all.filter(c => c.type == type) : all
@@ -495,6 +501,7 @@ class WebVaultClient {
    * @param {CipherView} cipherView - cipher to share
    */
   async shareWithCozy(cipherView) {
+    this.attachToGlobal()
     const org = await this.getCozyOrg()
     const cols = await this.getCollectionsForOrg(org)
     const colIds = cols.map(col => col.id)
@@ -529,6 +536,7 @@ class WebVaultClient {
    * @return {Cipher}
    */
   async createNewCipher(decryptedData, originalCipher = null) {
+    this.attachToGlobal()
     const orgId = decryptedData.organizationId
     const key = await (orgId
       ? this.cryptoService.getOrgKey(orgId)

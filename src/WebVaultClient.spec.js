@@ -1,6 +1,48 @@
 import WebVaultClient from './WebVaultClient'
+import { Utils } from './@bitwarden/jslib/misc/utils'
+
+jest.mock('./@bitwarden/jslib/misc/utils', () => {
+  return {
+    Utils: {
+      init: jest.fn(),
+      global: {}
+    }
+  }
+})
 
 describe('WebVaultClient', () => {
+  describe('global instance', () => {
+    it('should set the global container service variable', () => {
+      const client = new WebVaultClient('https://me.cozy.wtf')
+      expect(Utils.global.bitwardenContainerService).toBe(
+        client.containerService
+      )
+    })
+
+    it('should update the global container service variable when a new instance is created', () => {
+      const client1 = new WebVaultClient('https://me.cozy.wtf')
+      expect(Utils.global.bitwardenContainerService).toBe(
+        client1.containerService
+      )
+      const client2 = new WebVaultClient('https://myoue.cozy.wtf')
+      expect(Utils.global.bitwardenContainerService).toBe(
+        client2.containerService
+      )
+    })
+
+    it('should attach the current instances container service to the global context', () => {
+      const client1 = new WebVaultClient('https://me.cozy.wtf')
+      const client2 = new WebVaultClient('https://myoue.cozy.wtf')
+      expect(Utils.global.bitwardenContainerService).toBe(
+        client2.containerService
+      )
+      client1.attachToGlobal()
+      expect(Utils.global.bitwardenContainerService).toBe(
+        client1.containerService
+      )
+    })
+  })
+
   describe('weakMatch', () => {
     let client
     beforeAll(() => {
