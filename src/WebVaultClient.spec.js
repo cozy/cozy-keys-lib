@@ -1,7 +1,6 @@
 import WebVaultClient from './WebVaultClient'
 
 describe('WebVaultClient', () => {
-
   describe('weakMatch', () => {
     let client
     beforeAll(() => {
