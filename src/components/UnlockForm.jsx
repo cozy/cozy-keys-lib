@@ -50,12 +50,15 @@ class UnlockForm extends React.Component {
     const { t, onDismiss } = this.props
     const { password, error, unlocking } = this.state
     return (
-      <form onSubmit={this.unlockVault}>
-        <Modal
-          mobileFullscreen
-          className="u-bg-primaryColor"
-          closeBtnColor={palette['white']}
-          dismissAction={onDismiss}
+      <Modal
+        mobileFullscreen
+        className="u-bg-primaryColor"
+        closeBtnColor={palette['white']}
+        dismissAction={onDismiss}
+      >
+        <form
+          onSubmit={this.handleVaultUnlock}
+          className="u-flex u-flex-column u-flex-grow-1"
         >
           <ModalContent
             fixed
@@ -105,12 +108,11 @@ class UnlockForm extends React.Component {
               label={t('unlock.unlock')}
               theme="secondary"
               className="u-w-100-t u-primaryColor"
-              onClick={this.handleVaultUnlock}
               busy={unlocking}
             />
           </ModalFooter>
-        </Modal>
-      </form>
+        </form>
+      </Modal>
     )
   }
 }
