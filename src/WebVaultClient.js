@@ -535,67 +535,6 @@ class WebVaultClient {
       : this.cryptoService.getEncKey())
     return this.cipherService.encrypt(decryptedData, key, originalCipher)
   }
-
-  /**
-   * First step to change email
-   * Will send a token to the user in its email box
-   * @param {string} email
-   * @param {string} masterPassword
-   * @see https://github.com/bitwarden/web/blob/master/src/app/settings/change-email.component.ts
-   */
-  async changeEmailRequest(email, masterPassword) {
-    /* eslint-disable no-unreachable */
-    throw 'Email is generated, you should never change it'
-    await this.initFinished
-    const newEmail = email.trim().toLowerCase()
-    const request = new EmailTokenRequest()
-    request.newEmail = newEmail
-    request.masterPasswordHash = await this.cryptoService.hashPassword(
-      masterPassword,
-      null
-    )
-    await this.apiService.postEmailToken(request)
-  } /* eslint-enable no-unreachable */
-
-  /**
-   * Second step to change email
-   * Will encrypt the master key with the new master password and save the vault
-   * @param {string} email
-   * @param {string} masterPassword
-   * @param {string} token - from `changeEmailRequest()`
-   * @see https://github.com/bitwarden/web/blob/master/src/app/settings/change-email.component.ts
-   */
-  async changeEmail(email, masterPassword, token) {
-    /* eslint-disable no-unreachable */
-    throw 'Email is generated, you should never change it'
-    await this.initFinished
-    const newEmail = email.trim().toLowerCase()
-    const request = new EmailRequest()
-    request.token = token
-    request.newEmail = newEmail
-    request.masterPasswordHash = await this.cryptoService.hashPassword(
-      masterPassword,
-      null
-    )
-    const kdf = await this.userService.getKdf()
-    const kdfIterations = await this.userService.getKdfIterations()
-    const newKey = await this.cryptoService.makeKey(
-      masterPassword,
-      newEmail,
-      kdf,
-      kdfIterations
-    )
-    request.newMasterPasswordHash = await this.cryptoService.hashPassword(
-      masterPassword,
-      newKey
-    )
-    const newEncKey = await this.cryptoService.remakeEncKey(newKey)
-    request.key = newEncKey[1].encryptedString
-    await this.apiService.postEmail(request)
-    this.email = email
-    await this.login(masterPassword)
-    await this.sync()
-  } /* eslint-enable no-unreachable */
 }
 
 MicroEE.mixin(WebVaultClient)
