@@ -3,6 +3,26 @@ import StrippedWebPlatformUtilsService from './StrippedWebPlatformUtilsService'
 import { CryptoService } from './@bitwarden/jslib/services/crypto.service'
 import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoFunction.service'
 
+
+/**
+ * Check if the parameter is an instance URL or an email
+ * @param {string} instance_or_email - instance url or email
+ * @return {boolean}
+ */
+export function isEmail(instance_or_email) {
+  return instance_or_email.match('@')
+}
+
+/**
+ * Check if the parameter is an instance URL or an email
+ * @param {string} instance_or_email - instance url or email
+ * @return {boolean}
+ * @see isEmail
+ */
+export function isInstance(instance_or_email) {
+  return !isEmail(instance_or_email)
+}
+
 /**
  * Get user (fake) email
  * This email is generated with the instance URL
