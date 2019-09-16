@@ -506,6 +506,7 @@ class WebVaultClient {
 
   /**
    * Share a cipher with the cozy org
+   * If the organization has multiples collections, share with all collections
    * @param {CipherView} cipherView - cipher to share
    */
   async shareWithCozy(cipherView) {
@@ -525,7 +526,7 @@ class WebVaultClient {
   async getCollectionsForOrg(org) {
     const id = org.id ? org.id : org
     const collections = await this.collectionService.getAll()
-    return collections.filter(col => col.organizationId == id)
+    return collections.filter(col => col.organizationId === id)
   }
 
   /**
@@ -535,7 +536,7 @@ class WebVaultClient {
    */
   async getCozyOrg() {
     const orgs = await this.userService.getAllOrganizations()
-    return orgs.filter(org => org.name)[0]
+    return orgs.filter(org => org.name.match(/^cozy\b/i))[0]
   }
 
   /**
