@@ -81,7 +81,6 @@ class WebVaultClient {
 
     this.locale = locale || 'en'
     this.init({ unsafeStorage })
-    window.webVaultClient = this
   }
 
   /*
