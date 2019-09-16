@@ -70,7 +70,15 @@ class WebVaultClient {
   constructor(instance_or_email, { urls, locale, unsafeStorage } = {}) {
     this.instance = instance_or_email
     this.email = CozyUtils.getEmail(instance_or_email)
-    this.urls = urls || {} //TODO
+
+    if (urls) {
+      this.urls = urls
+    } else if (CozyUtils.isInstance(instance_or_email)) {
+      this.urls = { base: `${instance_or_email}/bitwarden` }
+    } else {
+      this.urls = {}
+    }
+
     this.locale = locale || 'en'
     this.init({ unsafeStorage })
     window.webVaultClient = this
