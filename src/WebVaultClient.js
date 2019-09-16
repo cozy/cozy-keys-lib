@@ -552,6 +552,20 @@ class WebVaultClient {
       : this.cryptoService.getEncKey())
     return this.cipherService.encrypt(decryptedData, key, originalCipher)
   }
+
+  /**
+   * Create a new (encrypted) cipher from a js object shared with the cozy org
+   * @param {object} decryptedData
+   * @return {Cipher}
+   */
+  async createNewCozySharedCipher(decryptedData, originalCipher = null) {
+    const org = await this.getCozyOrg()
+    const cols = await this.getCollectionsForOrg(org)
+    const colIds = cols.map(col => col.id)
+    decryptedData.organizationId = org.id
+    decryptedData.collectionIds = colIds
+    return this.createNewCipher(decryptedData, originalCipher)
+  }
 }
 
 MicroEE.mixin(WebVaultClient)
