@@ -30,7 +30,7 @@ export function isInstance(instance_or_email) {
  * @return {string} email
  */
 export function getEmail(instance) {
-  if (instance.match('@')) {
+  if (isEmail(instance)) {
     return instance.toString()
   } else {
     const url = new URL(instance.toString().toLowerCase())
@@ -84,5 +84,3 @@ function getLightCryptoService() {
   )
   return cryptoService
 }
-
-export default { getHashedPassword, getEmail }

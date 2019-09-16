@@ -1,5 +1,5 @@
 export { default as WebVaultClient } from './WebVaultClient'
-export { default as CozyUtils } from './CozyUtils'
+export * as CozyUtils from './CozyUtils'
 export { default as CipherType } from './CipherType'
 export { default as UriMatchType } from './UriMatchType'
 
