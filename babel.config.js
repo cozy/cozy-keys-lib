@@ -4,7 +4,11 @@ module.exports = {
   env: {
     transpilation: {
       presets: [['cozy-app', { lib: true }]],
-      plugins: ['@babel/plugin-proposal-export-default-from', 'inline-react-svg']
+      plugins: [
+        '@babel/plugin-proposal-export-default-from',
+        '@babel/plugin-proposal-export-namespace-from',
+        'inline-react-svg'
+      ]
     }
   }
 }
