@@ -8,33 +8,25 @@ import { Utils } from './@bitwarden/jslib/misc/utils'
 
 import { ApiService } from './@bitwarden/jslib/services/api.service'
 import { AppIdService } from './@bitwarden/jslib/services/appId.service'
-// import { AuditService } from './@bitwarden/jslib/services/audit.service'
 import { AuthService } from './@bitwarden/jslib/services/auth.service'
 import { CipherService } from './@bitwarden/jslib/services/cipher.service'
 import { CollectionService } from './@bitwarden/jslib/services/collection.service'
 import { ContainerService } from './@bitwarden/jslib/services/container.service'
 import { CryptoService } from './@bitwarden/jslib/services/crypto.service'
 import { EnvironmentService } from './@bitwarden/jslib/services/environment.service'
-// import { ExportService } from './@bitwarden/jslib/services/export.service'
 import { FolderService } from './@bitwarden/jslib/services/folder.service'
 import { I18nService } from './@bitwarden/jslib/services/i18n.service'
-// import { ImportService } from './@bitwarden/jslib/services/import.service'
 import { LockService } from './@bitwarden/jslib/services/lock.service'
 import { NoopMessagingService } from './@bitwarden/jslib/services/noopMessaging.service'
-//import { NotificationsService } from './@bitwarden/jslib/services/notifications.service'
 import { PasswordGenerationService } from './@bitwarden/jslib/services/passwordGeneration.service'
 import { SearchService } from './@bitwarden/jslib/services/search.service'
 import { SettingsService } from './@bitwarden/jslib/services/settings.service'
 import { SyncService } from './@bitwarden/jslib/services/sync.service'
-// import { TotpService } from './@bitwarden/jslib/services/totp.service'
 import { TokenService } from './@bitwarden/jslib/services/token.service'
 import { UserService } from './@bitwarden/jslib/services/user.service'
 import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoFunction.service'
 
 import { CipherType } from './@bitwarden/jslib/enums/cipherType'
-
-import { EmailRequest } from './@bitwarden/jslib/models/request/emailRequest'
-import { EmailTokenRequest } from './@bitwarden/jslib/models/request/emailTokenRequest'
 
 import WebPlatformUtilsService from './WebPlatformUtilsService'
 import HtmlStorageService from './HtmlStorageService'
@@ -167,7 +159,6 @@ class WebVaultClient {
       cryptoService,
       storageService
     )
-    // const totpService = new TotpService(storageService, cryptoFunctionService)
     const containerService = new ContainerService(cryptoService)
     const authService = new AuthService(
       cryptoService,
@@ -179,33 +170,12 @@ class WebVaultClient {
       platformUtilsService,
       messagingService
     )
-    // const exportService = new ExportService(
-    //   folderService,
-    //   cipherService,
-    //   apiService
-    // )
-    // const importService = new ImportService(
-    //   cipherService,
-    //   folderService,
-    //   apiService,
-    //   i18nService,
-    //   collectionService
-    // )
-    //const notificationsService = new NotificationsService(
-    //  userService,
-    //  syncService,
-    //  appIdService,
-    //  apiService,
-    //  lockService,
-    //  async () => messagingService.send('logout', { expired: true })
-    //)
     const notificationsService = null
     const environmentService = new EnvironmentService(
       apiService,
       storageService,
       notificationsService
     )
-    // const auditService = new AuditService(cryptoFunctionService, apiService)
     this.environmentService = environmentService
     this.authService = authService
     this.syncService = syncService
