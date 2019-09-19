@@ -189,6 +189,7 @@ class WebVaultClient {
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
     this.initFinished.then(() => this.emit('init', this))
+    this.Utils = Utils
   }
 
   /**
