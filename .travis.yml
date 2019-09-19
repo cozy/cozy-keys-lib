@@ -15,8 +15,10 @@ before_install:
 script:
   - set -e
   - yarn setup:submodule
+  - yarn lint
   - yarn build:jslib
   - yarn build:keys
+  - yarn test
 deploy:
   provider: script
   skip_cleanup: true
