@@ -32,119 +32,23 @@ import NodeEnvSecureStorageService from './NodeEnvSecureStorageService'
 Utils.init()
 
 class NodeVaultClient extends WebVaultClient {
-  /*
-   * @private
-   * Initialize the undelying libraries
-   */
-  init() {
-    const messagingService = new NoopMessagingService()
-    const i18nService = new I18nService(this.locale, './locales')
-    const platformUtilsService = new CliPlatformUtilsService('node', manifest)
-    const cryptoFunctionService = new NodeCryptoFunctionService()
-    const storageService = new MemoryStorageService()
-    const secureStorageService = new NodeEnvSecureStorageService(
+  initPlatformUtilsService() {
+    return new CliPlatformUtilsService('node', manifest)
+  }
+
+  initCryptoFunctionService() {
+    return new NodeCryptoFunctionService()
+  }
+
+  initSecureStorageService() {
+    return new NodeEnvSecureStorageService(
       new MemoryStorageService(),
       () => this.cryptoService
     )
-    const cryptoService = new CryptoService(
-      storageService,
-      secureStorageService,
-      cryptoFunctionService
-    )
-    const tokenService = new TokenService(storageService)
-    const appIdService = new AppIdService(storageService)
-    const apiService = new ApiService(
-      tokenService,
-      platformUtilsService,
-      async expired => messagingService.send('logout', { expired: expired })
-    )
-    const userService = new UserService(tokenService, storageService)
-    const settingsService = new SettingsService(userService, storageService)
-    let searchService = null
-    const cipherService = new CipherService(
-      cryptoService,
-      userService,
-      settingsService,
-      apiService,
-      storageService,
-      i18nService,
-      () => searchService
-    )
-    const folderService = new FolderService(
-      cryptoService,
-      userService,
-      apiService,
-      storageService,
-      i18nService,
-      cipherService
-    )
-    const collectionService = new CollectionService(
-      cryptoService,
-      userService,
-      storageService,
-      i18nService
-    )
-    searchService = new SearchService(cipherService, platformUtilsService)
-    const lockService = new LockService(
-      cipherService,
-      folderService,
-      collectionService,
-      cryptoService,
-      platformUtilsService,
-      storageService,
-      messagingService,
-      searchService,
-      userService,
-      null
-    )
-    const syncService = new SyncService(
-      userService,
-      apiService,
-      settingsService,
-      folderService,
-      cipherService,
-      cryptoService,
-      collectionService,
-      storageService,
-      messagingService,
-      async expired => messagingService.send('logout', { expired })
-    )
-    const passwordGenerationService = new PasswordGenerationService(
-      cryptoService,
-      storageService
-    )
-    const containerService = new ContainerService(cryptoService)
-    const authService = new AuthService(
-      cryptoService,
-      apiService,
-      userService,
-      tokenService,
-      appIdService,
-      i18nService,
-      platformUtilsService,
-      messagingService
-    )
-    const notificationsService = null
-    const environmentService = new EnvironmentService(
-      apiService,
-      storageService,
-      notificationsService
-    )
+  }
 
-    this.environmentService = environmentService
-    this.authService = authService
-    this.syncService = syncService
-    this.cryptoService = cryptoService
-    this.cipherService = cipherService
-    this.userService = userService
-    this.collectionService = collectionService
-    this.passwordGenerationService = passwordGenerationService
-    this.containerService = containerService
-    this.lockService = lockService
-    this.attachToGlobal()
-    this.initFinished = this.environmentService.setUrls(this.urls)
-    this.initFinished.then(() => this.emit('init', this))
-    this.Utils = Utils
+  initStorageService() {
+    return new MemoryStorageService()
   }
 }
 
