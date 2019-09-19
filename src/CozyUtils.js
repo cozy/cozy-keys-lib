@@ -3,7 +3,6 @@ import StrippedWebPlatformUtilsService from './StrippedWebPlatformUtilsService'
 import { CryptoService } from './@bitwarden/jslib/services/crypto.service'
 import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoFunction.service'
 
-
 /**
  * Check if the parameter is an instance URL or an email
  * @param {string} instance_or_email - instance url or email
