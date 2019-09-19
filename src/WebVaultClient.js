@@ -82,16 +82,15 @@ class WebVaultClient {
   init({ unsafeStorage }) {
     const messagingService = new NoopMessagingService()
     const i18nService = new I18nService(this.locale, './locales')
-    const platformUtilsService = new WebPlatformUtilsService(
+    const platformUtilsService = this.initPlatformUtilsService(
       i18nService,
       messagingService
     )
-    const cryptoFunctionService = new WebCryptoFunctionService(
-      window,
+    const cryptoFunctionService = this.initCryptoFunctionService(
       platformUtilsService
     )
-    const storageService = new HtmlStorageService(platformUtilsService)
-    const secureStorageService = new MemoryStorageService()
+    const storageService = this.initStorageService(platformUtilsService)
+    const secureStorageService = this.initSecureStorageService()
     const cryptoService = new CryptoService(
       storageService,
       unsafeStorage ? storageService : secureStorageService,
@@ -190,6 +189,22 @@ class WebVaultClient {
     this.initFinished = this.environmentService.setUrls(this.urls)
     this.initFinished.then(() => this.emit('init', this))
     this.Utils = Utils
+  }
+
+  initPlatformUtilsService(i18nService, messagingService) {
+    return new WebPlatformUtilsService(i18nService, messagingService)
+  }
+
+  initCryptoFunctionService(platformUtilsService) {
+    return new WebCryptoFunctionService(window, platformUtilsService)
+  }
+
+  initSecureStorageService() {
+    return new MemoryStorageService()
+  }
+
+  initStorageService(platformUtilsService) {
+    return new HtmlStorageService(platformUtilsService)
   }
 
   /**
