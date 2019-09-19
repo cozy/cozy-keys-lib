@@ -32,9 +32,9 @@ import { UserService } from './@bitwarden/jslib/services/user.service'
 import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoFunction.service'
 
 import { CipherType } from './@bitwarden/jslib/enums/cipherType'
+import { KdfType } from './@bitwarden/jslib/enums/kdfType'
 
-import { EmailRequest } from './@bitwarden/jslib/models/request/emailRequest'
-import { EmailTokenRequest } from './@bitwarden/jslib/models/request/emailTokenRequest'
+import { KdfRequest } from './@bitwarden/jslib/models/request/kdfRequest'
 
 import WebPlatformUtilsService from './WebPlatformUtilsService'
 import HtmlStorageService from './HtmlStorageService'
@@ -266,6 +266,180 @@ class WebVaultClient {
     await this.sync()
     this.emit('login', this)
     return login
+  }
+
+  /**
+   * Change password, send new hash and keys using the bitwarden API
+   * This method is for demo and test
+   * It uses routes NOT implemented on cozy stack
+   *
+   * @param {string} currentMasterPassword - the current master password
+   * @param {string} newMasterPassword - the new master password
+   * @param {integer} newIterations - (optional) number of kdf iterations
+   * @param {KdfType} newKdf - (optional) kdf algorithm, PBKDF2_SHA256 by default
+   */
+  async changePassword(
+    currentMasterPassword,
+    newMasterPassword,
+    newIterations,
+    newKdf
+  ) {
+    const {
+      kdf,
+      kdfIterations,
+      currentPasswordHash,
+      newPasswordHash,
+      newEncryptionKey
+    } = await this.computeNewHashAndKeys(
+      currentMasterPassword,
+      newMasterPassword,
+      newIterations,
+      newKdf
+    )
+    return this.bitwardenChangePassword(
+      currentPasswordHash,
+      newPasswordHash,
+      newEncryptionKey,
+      kdf,
+      kdfIterations
+    )
+  }
+
+  /**
+   * Compute new hashes and encrypted keys for a password change
+   * Does not change anything to the current instance
+   * @param {string} currentMasterPassword - the current master password
+   * @param {string} newMasterPassword - the new master password
+   * @param {integer} newIterations - (optional) number of kdf iterations
+   * @param {KdfType} newKdf - (optional) kdf algorithm, PBKDF2_SHA256 by default
+   * @return {object}
+   */
+  async computeNewHashAndKeys(
+    currentMasterPassword,
+    newMasterPassword,
+    newIterations,
+    newKdf
+  ) {
+    const currentPasswordHash = await this.computeHashedPassword(
+      currentMasterPassword
+    )
+
+    const kdf = newKdf || (await this.userService.getKdf())
+    const kdfIterations =
+      newIterations || (await this.userService.getKdfIterations())
+    const newMasterKey = await this.computeMasterKey(
+      newMasterPassword,
+      kdfIterations,
+      kdf
+    )
+
+    const newPasswordHash = await this.computeHashedPassword(
+      newMasterPassword,
+      newMasterKey
+    )
+
+    const currentEncryptionKey = await this.getEncryptionKey()
+    const newEncryptionKey = await this.encryptEncryptionKey(
+      currentEncryptionKey,
+      newMasterKey
+    )
+
+    return {
+      kdf,
+      kdfIterations,
+      currentPasswordHash,
+      newPasswordHash,
+      newEncryptionKey
+    }
+  }
+
+  /**
+   * Change password and encrypted keys using the Bitwarden APIs
+   * @param {string} currentPasswordHash - current master password hash
+   * @param {string} newPasswordHash - new master password hash
+   * @param {SymmetricCryptoKey} encryptionKey - new encrypted encryption key
+   * @param {KdfType} kdfType
+   * @param {integer} kdfIterations
+   */
+  async bitwardenChangePassword(
+    currentPasswordHash,
+    newPasswordHash,
+    encryptionKey,
+    kdf,
+    kdfIterations
+  ) {
+    const request = new KdfRequest()
+    request.kdf = kdf
+    request.kdfIterations = kdfIterations
+    request.masterPasswordHash = currentPasswordHash
+    request.newMasterPasswordHash = newPasswordHash
+    request.key = encryptionKey.encryptedString
+    const res = await this.apiService.postAccountKdf(request)
+    if (res) this.emit('passwordChange', this)
+    return res
+  }
+
+  /**
+   * Manually compute a master key
+   * @param {string} masterPassword
+   * @param {integer} iterations - (optional) number of kdf iterations
+   * @param {KdfType} kdf - (optional) kdf algorithm, PBKDF2_SHA256 by default
+   * @return {string} hashed password for login
+   */
+  async computeMasterKey(masterPassword, iterations, kdf) {
+    // clone the authService to avoid messing
+    // with the requested kdf and kdf iterations if provided
+    let authService = iterations
+      ? this.authService
+      : Object.assign(Object.create(this.authService), this.authService, {
+          kdfIterations: iterations,
+          kdf: kdf || KdfType.PBKDF2_SHA256
+        })
+    return await authService.makePreloginKey(masterPassword, this.email)
+  }
+
+  /**
+   * Manually compute a hashed password
+   * Usefull for manual login or password change
+   * @param {string} masterPassword
+   * @param {SymmetricCryptoKey} masterKey - optional master key
+   * @return {string} hashed password for login
+   */
+  async computeHashedPassword(masterPassword, masterKey) {
+    return await this.cryptoService.hashPassword(
+      masterPassword,
+      masterKey || null
+    )
+  }
+
+  /**
+   * Get the Encryption Key
+   * @return {SymmetricCryptoKey} the encryption AES key
+   */
+  async getEncryptionKey() {
+    return await this.cryptoService.getEncKey()
+  }
+
+  /**
+   * Get the Master Key
+   * @return {SymmetricCryptoKey} the master key, password derivation
+   */
+  async getMasterKey() {
+    return await this.cryptoService.getKey()
+  }
+
+  /**
+   * Manually encrypt the encryption key
+   * Usefull for a password change, with a new master key
+   * @param {SymmetricCryptoKey} encryptionKey
+   * @param {SymmetricCryptoKey} masterKey - optional
+   * @return {CipherString} encrypted encryption key
+   */
+  async encryptEncryptionKey(encryptionKey, masterKey) {
+    const key = masterKey || (await this.getMasterKey())
+    const toEncrypt = encryptionKey.key
+    const [, encrypted] = await this.cryptoService.buildEncKey(key, toEncrypt)
+    return encrypted
   }
 
   /**
