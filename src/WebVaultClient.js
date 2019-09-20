@@ -497,9 +497,13 @@ class WebVaultClient {
   async shareWithCozy(cipherView) {
     this.attachToGlobal()
     const org = await this.getCozyOrg()
-    const cols = await this.getCollectionsForOrg(org)
-    const colIds = cols.map(col => col.id)
-    return this.cipherService.shareWithServer(cipherView, org.id, colIds)
+    if (cipherView.organizationId != org.id) {
+      const cols = await this.getCollectionsForOrg(org)
+      const colIds = cols.map(col => col.id)
+      return this.cipherService.shareWithServer(cipherView, org.id, colIds)
+    } else {
+      return undefined
+    }
   }
 
   /**
