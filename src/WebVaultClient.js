@@ -8,25 +8,20 @@ import { Utils } from './@bitwarden/jslib/misc/utils'
 
 import { ApiService } from './@bitwarden/jslib/services/api.service'
 import { AppIdService } from './@bitwarden/jslib/services/appId.service'
-// import { AuditService } from './@bitwarden/jslib/services/audit.service'
 import { AuthService } from './@bitwarden/jslib/services/auth.service'
 import { CipherService } from './@bitwarden/jslib/services/cipher.service'
 import { CollectionService } from './@bitwarden/jslib/services/collection.service'
 import { ContainerService } from './@bitwarden/jslib/services/container.service'
 import { CryptoService } from './@bitwarden/jslib/services/crypto.service'
 import { EnvironmentService } from './@bitwarden/jslib/services/environment.service'
-// import { ExportService } from './@bitwarden/jslib/services/export.service'
 import { FolderService } from './@bitwarden/jslib/services/folder.service'
 import { I18nService } from './@bitwarden/jslib/services/i18n.service'
-// import { ImportService } from './@bitwarden/jslib/services/import.service'
 import { LockService } from './@bitwarden/jslib/services/lock.service'
 import { NoopMessagingService } from './@bitwarden/jslib/services/noopMessaging.service'
-//import { NotificationsService } from './@bitwarden/jslib/services/notifications.service'
 import { PasswordGenerationService } from './@bitwarden/jslib/services/passwordGeneration.service'
 import { SearchService } from './@bitwarden/jslib/services/search.service'
 import { SettingsService } from './@bitwarden/jslib/services/settings.service'
 import { SyncService } from './@bitwarden/jslib/services/sync.service'
-// import { TotpService } from './@bitwarden/jslib/services/totp.service'
 import { TokenService } from './@bitwarden/jslib/services/token.service'
 import { UserService } from './@bitwarden/jslib/services/user.service'
 import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoFunction.service'
@@ -90,16 +85,15 @@ class WebVaultClient {
   init({ unsafeStorage }) {
     const messagingService = new NoopMessagingService()
     const i18nService = new I18nService(this.locale, './locales')
-    const platformUtilsService = new WebPlatformUtilsService(
+    const platformUtilsService = this.initPlatformUtilsService(
       i18nService,
       messagingService
     )
-    const cryptoFunctionService = new WebCryptoFunctionService(
-      window,
+    const cryptoFunctionService = this.initCryptoFunctionService(
       platformUtilsService
     )
-    const storageService = new HtmlStorageService(platformUtilsService)
-    const secureStorageService = new MemoryStorageService()
+    const storageService = this.initStorageService(platformUtilsService)
+    const secureStorageService = this.initSecureStorageService()
     const cryptoService = new CryptoService(
       storageService,
       unsafeStorage ? storageService : secureStorageService,
@@ -167,7 +161,6 @@ class WebVaultClient {
       cryptoService,
       storageService
     )
-    // const totpService = new TotpService(storageService, cryptoFunctionService)
     const containerService = new ContainerService(cryptoService)
     const authService = new AuthService(
       cryptoService,
@@ -179,33 +172,12 @@ class WebVaultClient {
       platformUtilsService,
       messagingService
     )
-    // const exportService = new ExportService(
-    //   folderService,
-    //   cipherService,
-    //   apiService
-    // )
-    // const importService = new ImportService(
-    //   cipherService,
-    //   folderService,
-    //   apiService,
-    //   i18nService,
-    //   collectionService
-    // )
-    //const notificationsService = new NotificationsService(
-    //  userService,
-    //  syncService,
-    //  appIdService,
-    //  apiService,
-    //  lockService,
-    //  async () => messagingService.send('logout', { expired: true })
-    //)
     const notificationsService = null
     const environmentService = new EnvironmentService(
       apiService,
       storageService,
       notificationsService
     )
-    // const auditService = new AuditService(cryptoFunctionService, apiService)
     this.environmentService = environmentService
     this.authService = authService
     this.syncService = syncService
@@ -219,6 +191,23 @@ class WebVaultClient {
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
     this.initFinished.then(() => this.emit('init', this))
+    this.Utils = Utils
+  }
+
+  initPlatformUtilsService(i18nService, messagingService) {
+    return new WebPlatformUtilsService(i18nService, messagingService)
+  }
+
+  initCryptoFunctionService(platformUtilsService) {
+    return new WebCryptoFunctionService(window, platformUtilsService)
+  }
+
+  initSecureStorageService() {
+    return new MemoryStorageService()
+  }
+
+  initStorageService(platformUtilsService) {
+    return new HtmlStorageService(platformUtilsService)
   }
 
   /**
@@ -685,9 +674,13 @@ class WebVaultClient {
   async shareWithCozy(cipherView) {
     this.attachToGlobal()
     const org = await this.getCozyOrg()
-    const cols = await this.getCollectionsForOrg(org)
-    const colIds = cols.map(col => col.id)
-    return this.cipherService.shareWithServer(cipherView, org.id, colIds)
+    if (cipherView.organizationId != org.id) {
+      const cols = await this.getCollectionsForOrg(org)
+      const colIds = cols.map(col => col.id)
+      return this.cipherService.shareWithServer(cipherView, org.id, colIds)
+    } else {
+      return undefined
+    }
   }
 
   /**
