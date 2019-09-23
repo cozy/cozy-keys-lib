@@ -20,7 +20,7 @@
     "redux": "3.7.2"
   },
   "devDependencies": {
-    "@babel/runtime": "7.6.0",
+    "@babel/runtime": "7.6.2",
     "babel-polyfill": "^6.26.0",
     "parcel": "^1.12.3"
   }
