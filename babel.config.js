@@ -21,6 +21,10 @@ module.exports = {
               {
                 pattern: '^tldjs$',
                 location: path.resolve(__dirname, 'src/stubs/null.js')
+              },
+              {
+                pattern: '^sweetalert',
+                location: path.resolve(__dirname, 'src/stubs/null.js')
               }
             ]
           }
