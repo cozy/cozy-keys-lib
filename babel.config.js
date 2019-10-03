@@ -1,3 +1,5 @@
+const path = require('path')
+
 module.exports = {
   presets: ['cozy-app'],
   ignore: ['*.spec.js', '*.spec.jsx'],
@@ -7,7 +9,18 @@ module.exports = {
       plugins: [
         '@babel/plugin-proposal-export-default-from',
         '@babel/plugin-proposal-export-namespace-from',
-        'inline-react-svg'
+        'inline-react-svg',
+        [
+          'mock-imports',
+          {
+            redirects: [
+              {
+                pattern: '^zxcvbn$',
+                location: path.resolve(__dirname, 'src/stubs/null.js')
+              }
+            ]
+          }
+        ]
       ]
     }
   }
