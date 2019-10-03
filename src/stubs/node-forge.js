@@ -1,0 +1,8 @@
+module.exports = require('node-forge/lib/forge')
+require('node-forge/lib/asn1')
+require('node-forge/lib/cipher')
+require('node-forge/lib/hmac')
+require('node-forge/lib/md')
+require('node-forge/lib/pbkdf2')
+require('node-forge/lib/pki')
+require('node-forge/lib/util')

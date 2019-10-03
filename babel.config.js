@@ -25,6 +25,10 @@ module.exports = {
               {
                 pattern: '^sweetalert',
                 location: path.resolve(__dirname, 'src/stubs/null.js')
+              },
+              {
+                pattern: '^node-forge$',
+                location: path.resolve(__dirname, 'src/stubs/node-forge.js')
               }
             ]
           }
