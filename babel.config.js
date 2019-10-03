@@ -17,6 +17,10 @@ module.exports = {
               {
                 pattern: '^zxcvbn$',
                 location: path.resolve(__dirname, 'src/stubs/null.js')
+              },
+              {
+                pattern: '^tldjs$',
+                location: path.resolve(__dirname, 'src/stubs/null.js')
               }
             ]
           }
