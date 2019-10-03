@@ -34,7 +34,7 @@
     "@babel/cli": "7.4.4",
     "@babel/core": "^7.5.5",
     "@babel/plugin-proposal-export-default-from": "^7.5.2",
-    "@babel/plugin-transform-runtime": "^7.5.5",
+    "@babel/plugin-transform-runtime": "^7.6.0",
     "@babel/preset-env": "^7.5.5",
     "@babel/runtime": "^7.5.4",
     "@semantic-release/changelog": "^3.0.4",
@@ -49,7 +49,8 @@
     "enzyme-to-json": "3.3.5",
     "eslint-config-cozy-app": "^1.2.2",
     "jest": "24.8.0",
-    "semantic-release": "^15.13.24"
+    "semantic-release": "^15.13.24",
+    "webpack-cli": "^3.3.8"
   },
   "files": [
     "src",
@@ -59,6 +60,7 @@
   "dependencies": {
     "@aspnet/signalr": "^1.1.4",
     "@aspnet/signalr-protocol-msgpack": "^1.1.0",
+    "babel-plugin-import-redirect": "^1.1.1",
     "big-integer": "^1.6.44",
     "classnames": "^2.2.6",
     "cozy-device-helper": "^1.7.5",
@@ -72,6 +74,9 @@
     "react-dom": "^16.9.0",
     "sweetalert": "^2.1.2",
     "tldjs": "^2.3.1",
+    "webpack": "^4.39.3",
+    "webpack-bundle-analyzer": "^3.4.1",
+    "webpack-cli": "^3.3.8",
     "zxcvbn": "^4.4.2"
   }
 }

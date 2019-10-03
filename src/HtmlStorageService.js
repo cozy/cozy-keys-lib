@@ -7,26 +7,26 @@
 import { ConstantsService } from './@bitwarden/jslib/services/constants.service'
 
 export default class HtmlStorageService {
-  localStorageKeys = new Set([
-    'appId',
-    'anonymousAppId',
-    'rememberedEmail',
-    'passwordGenerationOptions',
-    ConstantsService.disableFaviconKey,
-    ConstantsService.lockOptionKey,
-    'rememberEmail',
-    'enableGravatars',
-    ConstantsService.localeKey,
-    ConstantsService.lockOptionKey,
-    ConstantsService.autoConfirmFingerprints
-  ])
-  localStorageStartsWithKeys = [
-    'twoFactorToken_',
-    ConstantsService.collapsedGroupingsKey + '_'
-  ]
-
   constructor(platformUtilsService) {
     this.platformUtilsService = platformUtilsService
+
+    this.localStorageKeys = new Set([
+      'appId',
+      'anonymousAppId',
+      'rememberedEmail',
+      'passwordGenerationOptions',
+      ConstantsService.disableFaviconKey,
+      ConstantsService.lockOptionKey,
+      'rememberEmail',
+      'enableGravatars',
+      ConstantsService.localeKey,
+      ConstantsService.lockOptionKey,
+      ConstantsService.autoConfirmFingerprints
+    ])
+    this.localStorageStartsWithKeys = [
+      'twoFactorToken_',
+      ConstantsService.collapsedGroupingsKey + '_'
+    ]
   }
 
   async init() {

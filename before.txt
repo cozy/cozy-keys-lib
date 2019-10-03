@@ -1,0 +1,30 @@
+4,0K	transpiled/__mocks__
+8,0K	transpiled/locales
+132K	transpiled/@bitwarden/jslib/misc
+232K	transpiled/@bitwarden/jslib/importers
+ 68K	transpiled/@bitwarden/jslib/enums
+ 44K	transpiled/@bitwarden/jslib/angular/directives
+ 16K	transpiled/@bitwarden/jslib/angular/pipes
+244K	transpiled/@bitwarden/jslib/angular/components
+ 16K	transpiled/@bitwarden/jslib/angular/services
+320K	transpiled/@bitwarden/jslib/angular
+156K	transpiled/@bitwarden/jslib/models/response
+ 52K	transpiled/@bitwarden/jslib/models/view
+ 24K	transpiled/@bitwarden/jslib/models/api
+256K	transpiled/@bitwarden/jslib/models/request
+ 48K	transpiled/@bitwarden/jslib/models/export
+ 56K	transpiled/@bitwarden/jslib/models/data
+116K	transpiled/@bitwarden/jslib/models/domain
+708K	transpiled/@bitwarden/jslib/models
+ 12K	transpiled/@bitwarden/jslib/cli/models/response
+ 16K	transpiled/@bitwarden/jslib/cli/models
+ 24K	transpiled/@bitwarden/jslib/cli/commands
+8,0K	transpiled/@bitwarden/jslib/cli/services
+ 56K	transpiled/@bitwarden/jslib/cli
+124K	transpiled/@bitwarden/jslib/abstractions
+ 28K	transpiled/@bitwarden/jslib/electron/services
+ 92K	transpiled/@bitwarden/jslib/electron
+576K	transpiled/@bitwarden/jslib/services
+2,3M	transpiled/@bitwarden/jslib
+ 24K	transpiled/components
+2,4M	transpiled
