@@ -1949,6 +1949,11 @@ babel-plugin-jest-hoist@^24.9.0:
   dependencies:
     "@types/babel__traverse" "^7.0.6"
 
+babel-plugin-mock-imports@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/babel-plugin-mock-imports/-/babel-plugin-mock-imports-1.0.2.tgz#c096e61e2b635ef348528ae387bda35477c6a7b1"
+  integrity sha512-QMVumiK+Z1yvA74IUsQGKx/XyZ6mKW7YNrEucDGbnWZU1RA/TjyBAwc86xHgkNVy4853jOWdjZY+/5l5bZ7lPQ==
+
 babel-plugin-rewire@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-rewire/-/babel-plugin-rewire-1.2.0.tgz#822562d72ed2c84e47c0f95ee232c920853e9d89"
