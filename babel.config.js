@@ -16,23 +16,23 @@ module.exports = {
             redirects: [
               {
                 pattern: '^zxcvbn$',
-                location: path.resolve(__dirname, 'src/stubs/null.js')
+                location: '../../../stubs/null.js'
               },
               {
                 pattern: '^tldjs$',
-                location: path.resolve(__dirname, 'src/stubs/null.js')
+                location: '../../../stubs/null.js'
               },
               {
                 pattern: '^sweetalert',
-                location: path.resolve(__dirname, 'src/stubs/null.js')
+                location: './stubs/null.js'
               },
               {
                 pattern: 'misc/wordlist$',
-                location: path.resolve(__dirname, 'src/stubs/null.js')
+                location: '../../../stubs/null.js'
               },
               {
                 pattern: '^node-forge$',
-                location: path.resolve(__dirname, 'src/stubs/node-forge.js')
+                location: '../../../stubs/node-forge.js'
               }
             ]
           }
