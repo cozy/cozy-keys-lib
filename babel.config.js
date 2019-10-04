@@ -27,6 +27,10 @@ module.exports = {
                 location: path.resolve(__dirname, 'src/stubs/null.js')
               },
               {
+                pattern: 'misc/wordlist$',
+                location: path.resolve(__dirname, 'src/stubs/null.js')
+              },
+              {
                 pattern: '^node-forge$',
                 location: path.resolve(__dirname, 'src/stubs/node-forge.js')
               }
