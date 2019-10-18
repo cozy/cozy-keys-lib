@@ -103,6 +103,7 @@ class UnlockForm extends React.Component {
               onClick={onDismiss}
               label={t('unlock.abort')}
               className="u-mr-half u-w-100-t"
+              type="button"
             />
             <Button
               label={t('unlock.unlock')}
