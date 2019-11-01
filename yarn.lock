@@ -2723,10 +2723,10 @@ cozy-device-helper@^1.7.5:
   dependencies:
     lodash "4.17.15"
 
-cozy-ui@^24.0.0:
-  version "24.2.2"
-  resolved "https://registry.yarnpkg.com/cozy-ui/-/cozy-ui-24.2.2.tgz#df3682b5aa188154b7a33fd0f52a983246be2204"
-  integrity sha512-0qy4HE0FWGZsvfrbDtFFAKPDk6E81pa9lzVF2G+RTK8zW+TeJNT612AUD2aZNJ0/WpYMew6kuotOYqpBHJrohw==
+cozy-ui@^25.0.0:
+  version "25.13.1"
+  resolved "https://registry.yarnpkg.com/cozy-ui/-/cozy-ui-25.13.1.tgz#fc7d2a4066c4a45c8894d1b59e7aff51dc9057a1"
+  integrity sha512-Xv7r65dj5RZKtqygSbsm07frATqJnZy4xSdD0tNoRpszHzqrqxozp0vKXlPPBM6/7J83esmGopcZXIv7+po6WA==
   dependencies:
     "@babel/runtime" "^7.3.4"
     body-scroll-lock "^2.5.8"
