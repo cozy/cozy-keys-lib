@@ -7,13 +7,21 @@ import Modal, {
 import { MainTitle, Text } from 'cozy-ui/transpiled/react/Text'
 import Icon from 'cozy-ui/transpiled/react/Icon'
 import Field from 'cozy-ui/transpiled/react/Field'
-import Button from 'cozy-ui/transpiled/react/Button'
+import Button, { ButtonLink } from 'cozy-ui/transpiled/react/Button'
 import CloudIcon from '../../assets/icon-cozy-security.svg'
 import palette from 'cozy-ui/transpiled/react/palette'
 import { translate } from 'cozy-ui/transpiled/react/I18n'
 import cx from 'classnames'
+import { withClient } from 'cozy-client'
+import compose from 'lodash/flowRight'
 
 import { withVaultClient } from './VaultContext'
+
+const getPassphraseResetUrl = client => {
+  const url = new URL('/auth/passphrase_reset', client.getStackClient().uri)
+
+  return url.href
+}
 
 class UnlockForm extends React.Component {
   constructor(props) {
@@ -46,9 +54,14 @@ class UnlockForm extends React.Component {
     }
   }
 
+  getPassphraseResetUrl() {
+    return getPassphraseResetUrl(this.props.client)
+  }
+
   render() {
     const { t, onDismiss, closable } = this.props
     const { password, error, unlocking } = this.state
+
     return (
       <Modal
         mobileFullscreen
@@ -100,6 +113,11 @@ class UnlockForm extends React.Component {
             />
           </ModalContent>
           <ModalFooter className="u-flex u-flex-justify-end">
+            <ButtonLink
+              href={this.getPassphraseResetUrl()}
+              label={t('unlock.forgotten-password')}
+              className="u-mr-auto"
+            />
             <Button
               onClick={onDismiss}
               label={t('unlock.abort')}
@@ -123,11 +141,16 @@ UnlockForm.propTypes = {
   vaultClient: PropTypes.object.isRequired,
   t: PropTypes.func.isRequired,
   onDismiss: PropTypes.func.isRequired,
-  closable: PropTypes.bool
+  closable: PropTypes.bool,
+  client: PropTypes.object.isRequired
 }
 
 UnlockForm.defaultProps = {
   closable: true
 }
 
-export default withVaultClient(translate()(UnlockForm))
+export default compose(
+  withClient,
+  withVaultClient,
+  translate()
+)(UnlockForm)
