@@ -7,6 +7,7 @@
     "show": "show",
     "hide": "hide",
     "abort": "Leave",
-    "unlock": "Unlock"
+    "unlock": "Unlock",
+    "forgotten-password": "Forgotten password"
   }
 }
