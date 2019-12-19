@@ -1,19 +1,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal, {
-  ModalContent,
-  ModalFooter
-} from 'cozy-ui/transpiled/react/Modal'
-import { MainTitle, Text } from 'cozy-ui/transpiled/react/Text'
-import Icon from 'cozy-ui/transpiled/react/Icon'
-import Field from 'cozy-ui/transpiled/react/Field'
-import Button, { ButtonLink } from 'cozy-ui/transpiled/react/Button'
+import Modal, { ModalContent } from 'cozy-ui/transpiled/react/Modal'
+import { MainTitle, Text, ErrorMessage } from 'cozy-ui/transpiled/react/Text'
+import Button from 'cozy-ui/transpiled/react/Button'
 import CloudIcon from '../../assets/icon-cozy-security.svg'
 import palette from 'cozy-ui/transpiled/react/palette'
 import { translate } from 'cozy-ui/transpiled/react/I18n'
+import withBreakpoints from 'cozy-ui/transpiled/react/helpers/withBreakpoints'
 import cx from 'classnames'
 import { withClient } from 'cozy-client'
 import compose from 'lodash/flowRight'
+import MuiCozyTheme from 'cozy-ui/transpiled/react/MuiCozyTheme'
+import PasswordField from './PasswordField'
 
 import { withVaultClient } from './VaultContext'
 
@@ -21,6 +19,43 @@ const getPassphraseResetUrl = client => {
   const url = new URL('/auth/passphrase_reset', client.getStackClient().uri)
 
   return url.href
+}
+
+const spacingToPadding = {
+  m: 3,
+  s: 1
+}
+
+const UnlockFormContent = ({ spacing, className, children, ...props }) => {
+  const padding = spacingToPadding[spacing]
+
+  return (
+    <ModalContent
+      fixed
+      className={cx(
+        'u-flex',
+        'u-flex-grow-1',
+        'u-flex-column',
+        'u-flex-items-center',
+        'u-bdw-0',
+        'u-pt-3',
+        `u-pb-${padding}`,
+        `u-ph-${padding}`,
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </ModalContent>
+  )
+}
+
+UnlockFormContent.propTypes = {
+  spacing: PropTypes.oneOf(['m', 's'])
+}
+
+UnlockFormContent.defaultProps = {
+  spacing: 'm'
 }
 
 class UnlockForm extends React.Component {
@@ -59,80 +94,72 @@ class UnlockForm extends React.Component {
   }
 
   render() {
-    const { t, onDismiss, closable } = this.props
+    const {
+      t,
+      onDismiss,
+      closable,
+      breakpoints: { isMobile }
+    } = this.props
     const { password, error, unlocking } = this.state
 
     return (
-      <Modal
-        mobileFullscreen
-        className="u-bg-primaryColor"
-        closeBtnColor={palette['white']}
-        dismissAction={onDismiss}
-        closable={closable}
-      >
-        <form
-          onSubmit={this.handleVaultUnlock}
-          className="u-flex u-flex-column u-flex-grow-1"
+      <MuiCozyTheme variant="inverted">
+        <Modal
+          mobileFullscreen
+          className="u-bg-primaryColor"
+          closeBtnColor={palette['white']}
+          dismissAction={onDismiss}
+          closable={closable}
         >
-          <ModalContent
-            fixed
-            className="u-flex u-flex-column u-flex-items-center u-flex-grow-1 u-bg-primaryColor u-bdw-0"
+          <form
+            onSubmit={this.handleVaultUnlock}
+            className="u-flex u-flex-column u-flex-grow-1"
           >
-            <div className="u-mt-3">
+            <UnlockFormContent spacing={isMobile ? 's' : 'm'}>
               <CloudIcon />
-            </div>
-            <MainTitle className="u-primaryContrastTextColor">
-              {t('unlock.title')}
-            </MainTitle>
-            <Text
-              className={cx(
-                'u-mb-1-half',
-                error ? 'u-yourPink' : 'u-primaryContrastTextColor'
+              <MainTitle className="u-primaryContrastTextColor">
+                {t('unlock.title')}
+              </MainTitle>
+              {error ? (
+                <ErrorMessage>{t('unlock.error')}</ErrorMessage>
+              ) : (
+                <Text className="u-primaryContrastTextColor">
+                  {t('unlock.subtitle')}
+                </Text>
               )}
-            >
-              {error ? t('unlock.error') : t('unlock.subtitle')}
-            </Text>
 
-            <Field
-              id="idField"
-              label={t('unlock.label')}
-              type="password"
-              value={password}
-              error={!!error}
-              onChange={e => this.setState({ password: e.currentTarget.value })}
-              fullwidth
-              className="u-w-100 u-primaryContrastTextColor"
-              secondaryComponent={({ visible }) =>
-                visible ? (
-                  <Icon aria-label={t('unlock.show')} icon="eye-closed" />
-                ) : (
-                  <Icon icon="eye" aria-label={t('unlock.hide')} />
-                )
-              }
-              labelProps={{ className: 'u-white' }}
-            />
-          </ModalContent>
-          <ModalFooter className="u-flex u-flex-justify-end">
-            <ButtonLink
-              href={this.getPassphraseResetUrl()}
-              label={t('unlock.forgotten-password')}
-              className="u-mr-auto"
-            />
-            <Button
-              onClick={onDismiss}
-              label={t('unlock.abort')}
-              className="u-mr-half u-w-100-t"
-              type="button"
-            />
-            <Button
-              label={t('unlock.unlock')}
-              theme="secondary"
-              className="u-w-100-t u-primaryColor"
-              busy={unlocking}
-            />
-          </ModalFooter>
-        </form>
-      </Modal>
+              <PasswordField
+                id="idField"
+                label={t('unlock.label')}
+                value={password}
+                onChange={e =>
+                  this.setState({ password: e.currentTarget.value })
+                }
+                fullWidth
+                className="u-mt-2"
+              />
+
+              <Text
+                tag="a"
+                href={this.getPassphraseResetUrl()}
+                className="u-link u-primaryContrastTextColor u-mt-1 u-flex-self-start"
+              >
+                {t('unlock.forgotten-password')}
+              </Text>
+              <Button
+                label={t('unlock.unlock')}
+                theme="secondary"
+                className={cx('u-primaryColor', {
+                  'u-mt-2-half': !isMobile,
+                  'u-mt-auto': isMobile
+                })}
+                busy={unlocking}
+                extension="full"
+              />
+            </UnlockFormContent>
+          </form>
+        </Modal>
+      </MuiCozyTheme>
     )
   }
 }
@@ -152,5 +179,6 @@ UnlockForm.defaultProps = {
 export default compose(
   withClient,
   withVaultClient,
-  translate()
+  translate(),
+  withBreakpoints()
 )(UnlockForm)

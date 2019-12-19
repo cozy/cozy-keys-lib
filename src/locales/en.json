@@ -1,13 +1,13 @@
 {
   "unlock": {
     "title": "Login",
-    "subtitle": "Unlock your Cozy to proceed",
+    "subtitle": "For security, please confirm your identity",
     "error": "Incorrect password",
-    "label": "Password",
+    "label": "Cozy password",
     "show": "show",
     "hide": "hide",
     "abort": "Leave",
     "unlock": "Unlock",
-    "forgotten-password": "Forgotten password"
+    "forgotten-password": "I forgot my password"
   }
 }
