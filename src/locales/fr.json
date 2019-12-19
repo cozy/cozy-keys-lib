@@ -1,13 +1,13 @@
 {
   "unlock": {
     "title": "Authentification",
-    "subtitle": "Déverrouiller votre Cozy pour continuer",
+    "subtitle": "Par sécurité, merci de confirmer votre identité",
     "error": "Mot de passe incorrect, essayer à nouveau",
-    "label": "Mot de passe",
+    "label": "Mot de passe Cozy",
     "show": "afficher",
     "hide": "masquer",
     "abort": "Quitter",
     "unlock": "Déverrouiller",
-    "forgotten-password": "Mot de passe oublié"
+    "forgotten-password": "J'ai oublié mon mot de passe"
   }
 }
