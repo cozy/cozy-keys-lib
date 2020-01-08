@@ -78,10 +78,11 @@ class UnlockForm extends React.Component {
   }
 
   async unlockVault() {
-    const { vaultClient } = this.props
+    const { vaultClient, onUnlock } = this.props
     this.setState({ unlocking: true, error: null })
     try {
       await vaultClient.unlock(this.state.password)
+      onUnlock()
     } catch (error) {
       this.setState({ error })
     } finally {

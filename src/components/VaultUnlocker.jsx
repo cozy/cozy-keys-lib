@@ -10,10 +10,10 @@ const locales = {
   fr: localesFr
 }
 
-const VaultUnlocker = ({ children, onDismiss, closable }) => {
+const VaultUnlocker = ({ children, onDismiss, closable, onUnlock }) => {
   const { locked } = React.useContext(VaultContext)
   return locked ? (
-    <UnlockForm onDismiss={onDismiss} closable={closable} />
+    <UnlockForm onDismiss={onDismiss} closable={closable} onUnlock={onUnlock} />
   ) : (
     children
   )
