@@ -78,10 +78,14 @@ class UnlockForm extends React.Component {
   }
 
   async unlockVault() {
-    const { vaultClient } = this.props
+    const { vaultClient, onUnlock } = this.props
     this.setState({ unlocking: true, error: null })
     try {
       await vaultClient.unlock(this.state.password)
+
+      if (onUnlock) {
+        onUnlock()
+      }
     } catch (error) {
       this.setState({ error })
     } finally {
@@ -169,7 +173,8 @@ UnlockForm.propTypes = {
   t: PropTypes.func.isRequired,
   onDismiss: PropTypes.func.isRequired,
   closable: PropTypes.bool,
-  client: PropTypes.object.isRequired
+  client: PropTypes.object.isRequired,
+  onUnlock: PropTypes.func
 }
 
 UnlockForm.defaultProps = {
