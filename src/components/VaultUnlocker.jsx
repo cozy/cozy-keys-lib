@@ -29,9 +29,7 @@ const VaultUnlocker = ({
   useEffect(() => {
     const checkCiphers = async () => {
       try {
-        const { data } = await cozyClient.query(
-          cozyClient.find(CIPHERS_DOCTYPE).where({ shared_with_cozy: true })
-        )
+        const { data } = await cozyClient.query(cozyClient.find(CIPHERS_DOCTYPE))
 
         const hasCiphers = data.length > 0
 
