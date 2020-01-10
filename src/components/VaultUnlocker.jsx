@@ -13,6 +13,7 @@ const locales = {
 }
 
 const CIPHERS_DOCTYPE = 'com.bitwarden.ciphers'
+const SETTINGS_DOCTYPE = 'io.cozy.settings'
 
 const isForbiddenError = rawError => {
   return rawError.message.match(/code=403/)
@@ -26,6 +27,7 @@ const checkHasCiphers = async cozyClient => {
 
     return ciphers.length > 0
   } catch (err) {
+    /* eslint-disable no-console */
     console.error('Error while fetching ciphers:')
     if (isForbiddenError(err)) {
       console.error(
@@ -34,6 +36,34 @@ const checkHasCiphers = async cozyClient => {
     } else {
       console.error(err)
     }
+    /* eslint-enable no-console */
+
+    return false
+  }
+}
+
+const checkHasCozyOrg = async cozyClient => {
+  try {
+    const { rows: docs } = await cozyClient
+      .getStackClient()
+      .fetchJSON('GET', `/data/${SETTINGS_DOCTYPE}/_normal_docs`)
+
+    const [bitwardenSettings] = docs.filter(
+      doc => doc._id === 'io.cozy.settings.bitwarden'
+    )
+
+    return bitwardenSettings && bitwardenSettings.organization_id
+  } catch (err) {
+    /* eslint-disable no-console */
+    console.error('Error while fetching bitwarden settings:')
+    if (isForbiddenError(err)) {
+      console.error(
+        `Your app must have the GET permission on the ${SETTINGS_DOCTYPE} doctype.`
+      )
+    } else {
+      console.error(err)
+    }
+    /* eslint-enable no-console */
 
     return false
   }
@@ -46,29 +76,31 @@ const VaultUnlocker = ({
   onUnlock,
   client: cozyClient
 }) => {
-  const [isCheckingCiphers, setIsCheckingCiphers] = useState(true)
-  const [hasCiphers, setHasCiphers] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
+  const [shouldUnlock, setShouldUnlock] = useState(false)
 
   const { locked } = React.useContext(VaultContext)
 
   useEffect(() => {
-    const checkCiphers = async () => {
+    const checkShouldUnlock = async () => {
       const hasCiphers = await checkHasCiphers(cozyClient)
-      setHasCiphers(hasCiphers)
-      setIsCheckingCiphers(false)
+      const hasCozyOrg = await checkHasCozyOrg(cozyClient)
+      const shouldUnlock = hasCiphers || hasCozyOrg
+
+      setShouldUnlock(shouldUnlock)
+      setIsChecking(false)
 
       // If there is no cipher in the vault, it means the user never used it,
       // so we don't force them to unlock it for nothing
-      if (!hasCiphers && onUnlock) {
+      if (!shouldUnlock && onUnlock) {
         onUnlock()
       }
-
     }
 
-    checkCiphers()
+    checkShouldUnlock()
   }, [])
 
-  if (isCheckingCiphers) {
+  if (isChecking) {
     return (
       <div className="u-ta-center">
         <Spinner size="xxlarge" />
@@ -76,7 +108,7 @@ const VaultUnlocker = ({
     )
   }
 
-  return locked && hasCiphers ? (
+  return locked && shouldUnlock ? (
     <UnlockForm onDismiss={onDismiss} closable={closable} onUnlock={onUnlock} />
   ) : (
     children
