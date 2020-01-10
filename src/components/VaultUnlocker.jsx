@@ -14,6 +14,21 @@ const locales = {
 
 const CIPHERS_DOCTYPE = 'com.bitwarden.ciphers'
 
+const checkHasCiphers = async cozyClient => {
+  try {
+    const { data: ciphers } = await cozyClient.query(
+      cozyClient.find(CIPHERS_DOCTYPE)
+    )
+
+    return ciphers.length > 0
+  } catch (err) {
+    console.error('Error while fetching ciphers:')
+    console.error(err)
+
+    return false
+  }
+}
+
 const VaultUnlocker = ({
   children,
   onDismiss,
@@ -28,26 +43,16 @@ const VaultUnlocker = ({
 
   useEffect(() => {
     const checkCiphers = async () => {
-      try {
-        const { data } = await cozyClient.query(cozyClient.find(CIPHERS_DOCTYPE))
+      const hasCiphers = await checkHasCiphers(cozyClient)
+      setHasCiphers(hasCiphers)
+      setIsCheckingCiphers(false)
 
-        const hasCiphers = data.length > 0
-
-        setHasCiphers(hasCiphers)
-
-        // If there is no cipher in the vault, it means the user never used it,
-        // so we don't force them to unlock it for nothing
-        if (!hasCiphers && onUnlock) {
-          onUnlock()
-        }
-      } catch (err) {
-        /* eslint-disable no-console */
-        console.error(`Error while fetching ${CIPHERS_DOCTYPE}:`)
-        console.error(err)
-        /* eslint-enable no-console */
-      } finally {
-        setIsCheckingCiphers(false)
+      // If there is no cipher in the vault, it means the user never used it,
+      // so we don't force them to unlock it for nothing
+      if (!hasCiphers && onUnlock) {
+        onUnlock()
       }
+
     }
 
     checkCiphers()
