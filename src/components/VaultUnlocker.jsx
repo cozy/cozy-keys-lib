@@ -6,13 +6,12 @@ import localesEn from '../locales/en.json'
 import localesFr from '../locales/fr.json'
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
 import { withClient } from 'cozy-client'
+import { checkHasCiphers, checkHasCozyOrg } from '../utils'
 
 const locales = {
   en: localesEn,
   fr: localesFr
 }
-
-const CIPHERS_DOCTYPE = 'com.bitwarden.ciphers'
 
 const VaultUnlocker = ({
   children,
@@ -21,41 +20,31 @@ const VaultUnlocker = ({
   onUnlock,
   client: cozyClient
 }) => {
-  const [isCheckingCiphers, setIsCheckingCiphers] = useState(true)
-  const [hasCiphers, setHasCiphers] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
+  const [shouldUnlock, setShouldUnlock] = useState(false)
 
   const { locked } = React.useContext(VaultContext)
 
   useEffect(() => {
-    const checkCiphers = async () => {
-      try {
-        const { data } = await cozyClient.query(
-          cozyClient.find(CIPHERS_DOCTYPE).where({ shared_with_cozy: true })
-        )
+    const checkShouldUnlock = async () => {
+      const hasCiphers = await checkHasCiphers(cozyClient)
+      const hasCozyOrg = await checkHasCozyOrg(cozyClient)
+      const shouldUnlock = hasCiphers || hasCozyOrg
 
-        const hasCiphers = data.length > 0
+      setShouldUnlock(shouldUnlock)
+      setIsChecking(false)
 
-        setHasCiphers(hasCiphers)
-
-        // If there is no cipher in the vault, it means the user never used it,
-        // so we don't force them to unlock it for nothing
-        if (!hasCiphers && onUnlock) {
-          onUnlock()
-        }
-      } catch (err) {
-        /* eslint-disable no-console */
-        console.error(`Error while fetching ${CIPHERS_DOCTYPE}:`)
-        console.error(err)
-        /* eslint-enable no-console */
-      } finally {
-        setIsCheckingCiphers(false)
+      // If there is no cipher in the vault, it means the user never used it,
+      // so we don't force them to unlock it for nothing
+      if (!shouldUnlock && onUnlock) {
+        onUnlock()
       }
     }
 
-    checkCiphers()
+    checkShouldUnlock()
   }, [])
 
-  if (isCheckingCiphers) {
+  if (isChecking) {
     return (
       <div className="u-ta-center">
         <Spinner size="xxlarge" />
@@ -63,7 +52,7 @@ const VaultUnlocker = ({
     )
   }
 
-  return locked && hasCiphers ? (
+  return locked && shouldUnlock ? (
     <UnlockForm onDismiss={onDismiss} closable={closable} onUnlock={onUnlock} />
   ) : (
     children
