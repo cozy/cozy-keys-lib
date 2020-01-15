@@ -6,7 +6,7 @@ import localesEn from '../locales/en.json'
 import localesFr from '../locales/fr.json'
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
 import { withClient } from 'cozy-client'
-import { checkHasCiphers } from '../utils'
+import { checkHasCiphers, checkHasInstalledExtension } from '../utils'
 
 const locales = {
   en: localesEn,
@@ -27,8 +27,11 @@ const VaultUnlocker = ({
 
   useEffect(() => {
     const checkShouldUnlock = async () => {
-      const hasCiphers = await checkHasCiphers(cozyClient)
-      const shouldUnlock = hasCiphers
+      let shouldUnlock = await checkHasCiphers(cozyClient)
+
+      if (!shouldUnlock) {
+        shouldUnlock = await checkHasInstalledExtension(cozyClient)
+      }
 
       setShouldUnlock(shouldUnlock)
       setIsChecking(false)
