@@ -46,7 +46,7 @@
     "babel-plugin-mock-imports": "^1.0.2",
     "babel-plugin-rewire": "1.2.0",
     "babel-preset-cozy-app": "^1.6.0",
-    "cozy-client": "^8.5.1",
+    "cozy-client": "^8.8.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "3.4.0",
@@ -78,6 +78,6 @@
     "zxcvbn": "^4.4.2"
   },
   "peerDependencies": {
-    "cozy-client": "^8.5.1"
+    "cozy-client": "^8.8.0"
   }
 }
