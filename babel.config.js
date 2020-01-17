@@ -19,10 +19,6 @@ module.exports = {
                 location: '../../../stubs/null.js'
               },
               {
-                pattern: '^tldjs$',
-                location: '../../../stubs/null.js'
-              },
-              {
                 pattern: '^sweetalert',
                 location: './stubs/null.js'
               },
