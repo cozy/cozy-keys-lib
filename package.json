@@ -2,7 +2,8 @@
   "name": "cozy-keys-lib",
   "version": "0.0.0-development",
   "description": "Interactions between cozy-keys and a bitwarden server",
-  "main": "transpiled/index.js",
+  "browser": "transpiled/index.js",
+  "main": "transpiled/index.node.js",
   "scripts": {
     "setup:submodule": "git submodule init && git submodule update",
     "setup": "yarn run setup:submodule",
