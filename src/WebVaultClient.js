@@ -16,6 +16,7 @@ import { CryptoService } from './@bitwarden/jslib/services/crypto.service'
 import { EnvironmentService } from './@bitwarden/jslib/services/environment.service'
 import { FolderService } from './@bitwarden/jslib/services/folder.service'
 import { I18nService } from './@bitwarden/jslib/services/i18n.service'
+import { ImportService } from './@bitwarden/jslib/services/import.service'
 import { LockService } from './@bitwarden/jslib/services/lock.service'
 import { NoopMessagingService } from './@bitwarden/jslib/services/noopMessaging.service'
 import { PasswordGenerationService } from './@bitwarden/jslib/services/passwordGeneration.service'
@@ -178,6 +179,13 @@ class WebVaultClient {
       storageService,
       notificationsService
     )
+    const importService = new ImportService(
+      cipherService,
+      folderService,
+      apiService,
+      i18nService,
+      collectionService
+    )
     this.environmentService = environmentService
     this.authService = authService
     this.syncService = syncService
@@ -188,6 +196,7 @@ class WebVaultClient {
     this.passwordGenerationService = passwordGenerationService
     this.containerService = containerService
     this.lockService = lockService
+    this.importService = importService
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
     this.initFinished.then(() => this.emit('init', this))
@@ -731,6 +740,107 @@ class WebVaultClient {
     decryptedData.organizationId = org.id
     decryptedData.collectionIds = colIds
     return this.createNewCipher(decryptedData, originalCipher)
+  }
+
+  /**
+   * Import ciphers contained in a file in a given format
+   *
+   * @param {string} fileContent - the raw content of the file being imported
+   * @param {string} format - the format of the file (see ImportService for all available formats)
+   */
+  async import(fileContent, format) {
+    const importer = this.importService.getImporter(format, false)
+
+    if (!importer) {
+      throw new Error('IMPORT_UNKNOWN_FORMAT')
+    }
+
+    const parseResult = await importer.parse(fileContent)
+
+    if (parseResult.success) {
+      // Error case copy/pasted from ImportService::import
+      if (parseResult.ciphers.length > 0) {
+        const halfway = Math.floor(parseResult.ciphers.length / 2)
+        const last = parseResult.ciphers.length - 1
+
+        if (
+          this.importService.badData(parseResult.ciphers[0]) &&
+          this.importService.badData(parseResult.ciphers[halfway]) &&
+          this.importService.badData(parseResult.ciphers[last])
+        ) {
+          throw new Error('IMPORT_BAD_FILE_CONTENT')
+        }
+      }
+
+      for (let i = 0; i < parseResult.ciphers.length; ++i) {
+        const importingCipher = parseResult.ciphers[i]
+        let cipherToSave
+
+        let encryptedExistingCipher
+
+        // Since we search existing cipher by username, password and URI; and a
+        // cipher being imported can have multiple URIs, we have to look for an
+        // existing cipher for each URI. The getByIdOrSearch API may be better
+        // and accept an array of strings
+        for (const uri of importingCipher.login.uris) {
+          const search = {
+            username: importingCipher.login.username,
+            uri: uri._uri,
+            type: CipherType.Login
+          }
+
+          const sort = [
+            view => view.login.password === importingCipher.login.password,
+            'revisionDate'
+          ]
+
+          encryptedExistingCipher = await this.getByIdOrSearch(
+            null,
+            search,
+            sort
+          )
+
+          if (encryptedExistingCipher) {
+            break
+          }
+        }
+
+        if (encryptedExistingCipher) {
+          const decryptedExistingCipher = await this.decrypt(
+            encryptedExistingCipher
+          )
+
+          for (const uri of importingCipher.login.uris) {
+            const hasUri = decryptedExistingCipher.login.uris.find(
+              existingUri =>
+                existingUri.match === uri.match && existingUri.uri === uri.uri
+            )
+
+            if (!hasUri) {
+              decryptedExistingCipher.login.uris.push(uri)
+            }
+          }
+
+          cipherToSave = await this.createNewCipher(
+            decryptedExistingCipher,
+            encryptedExistingCipher
+          )
+        } else {
+          cipherToSave = await this.createNewCipher(importingCipher)
+        }
+
+        await this.saveCipher(cipherToSave)
+      }
+    } else {
+      throw new Error('IMPORT_FORMAT_ERROR')
+    }
+  }
+
+  getImportOptions() {
+    return {
+      featured: this.importService.featuredImportOptions,
+      regular: this.importService.regularImportOptions
+    }
   }
 }
 
