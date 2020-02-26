@@ -1,14 +1,7 @@
 import WebVaultClient from './WebVaultClient'
 import { Utils } from './@bitwarden/jslib/misc/utils'
 
-jest.mock('./@bitwarden/jslib/misc/utils', () => {
-  return {
-    Utils: {
-      init: jest.fn(),
-      global: {}
-    }
-  }
-})
+jest.spyOn(Utils, 'init').mockImplementation(() => {})
 
 describe('WebVaultClient', () => {
   describe('global instance', () => {
@@ -119,6 +112,135 @@ describe('WebVaultClient', () => {
       const source = 'Hello'
       const compare = /Sal(l)?ut/
       expect(client.weakMatch(source, compare)).toBeFalsy()
+    })
+  })
+
+  describe('import', () => {
+    const client = new WebVaultClient('https://me.cozy.wtf')
+    const fileContent = `{
+  "folders": [],
+  "items": [
+    {
+      "id": "04aa600a-fd2e-48f5-8560-aac6011f9cbd",
+      "organizationId": null,
+      "folderId": null,
+      "type": 1,
+      "name": "alan.com",
+      "notes": null,
+      "favorite": false,
+      "login": {
+        "uris": [
+          {
+            "match": null,
+            "uri": "https://alan.eu/login"
+          },
+          {
+            "match": null,
+            "uri": "https://alan.com"
+          }
+        ],
+        "username": "username",
+        "password": "password",
+        "totp": null
+      },
+      "collectionIds": null
+    }
+  ]
+}`
+
+    jest
+      .spyOn(client, 'createNewCipher')
+      .mockImplementation(cipher => Promise.resolve(cipher))
+
+    jest
+      .spyOn(client, 'decrypt')
+      .mockImplementation(cipher => Promise.resolve(cipher))
+
+    jest.spyOn(client, 'saveCipher').mockResolvedValue()
+    jest.spyOn(client, 'getByIdOrSearch')
+
+    afterEach(() => {
+      client.createNewCipher.mockClear()
+      client.decrypt.mockClear()
+      client.saveCipher.mockClear()
+      client.getByIdOrSearch.mockReset()
+    })
+
+    describe('when the imported cipher already exists', () => {
+      const existingCipher = {
+        id: 'existing-cipher',
+        organizationId: null,
+        folderId: null,
+        type: 1,
+        name: 'alan.com',
+        notes: null,
+        favorite: false,
+        login: {
+          uris: [
+            {
+              match: null,
+              uri: 'https://alan.eu/login'
+            }
+          ],
+          username: 'username',
+          password: 'password',
+          totp: null
+        },
+        collectionIds: null
+      }
+
+      beforeEach(() => {
+        client.getByIdOrSearch.mockResolvedValue(existingCipher)
+      })
+
+      it("should add imported cipher's uris to existing cipher", async () => {
+        await client.import(fileContent, 'bitwardenjson')
+        const savedUris = client.saveCipher.mock.calls[0][0].login.uris
+
+        expect(savedUris).toHaveLength(2)
+        expect(savedUris[0].uri).toBe('https://alan.eu/login')
+        expect(savedUris[1].uri).toBe('https://alan.com')
+      })
+    })
+
+    describe('when the imported cipher does not already exist', () => {
+      beforeEach(() => {
+        client.getByIdOrSearch.mockResolvedValue(null)
+      })
+
+      it('should create a new cipher', async () => {
+        await client.import(fileContent, 'bitwardenjson')
+        expect(client.createNewCipher).toHaveBeenCalledTimes(1)
+        expect(client.saveCipher).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('when given an unknown format', () => {
+      it('should throw an error', async () => {
+        await expect(
+          client.import(fileContent, 'unknownformat')
+        ).rejects.toThrow('IMPORT_UNKNOWN_FORMAT')
+      })
+    })
+
+    describe('when the data imported is bad', () => {
+      beforeEach(() => {
+        jest
+          .spyOn(client.importService, 'getImporter')
+          .mockImplementation(() => ({
+            parse: () => ({ success: false })
+          }))
+      })
+
+      afterEach(() => {
+        client.importService.getImporter.mockRestore()
+      })
+
+      it('should throw an error', async () => {
+        await expect(client.import('{}', 'bitwardenjson')).rejects.toThrow(
+          'IMPORT_FORMAT_ERROR'
+        )
+      })
     })
   })
 })
