@@ -38,6 +38,8 @@ import MemoryStorageService from './MemoryStorageService'
 
 import * as CozyUtils from './CozyUtils'
 
+import pLimit from 'p-limit'
+
 Utils.init()
 
 /**
@@ -772,9 +774,11 @@ class WebVaultClient {
         }
       }
 
-      await Promise.all(
-        parseResult.ciphers.map(cipher => this.importCipher(cipher))
+      const limit = pLimit(50)
+      const promises = parseResult.ciphers.map(cipher => async () =>
+        this.importCipher(cipher)
       )
+      await Promise.all(promises.map(limit))
     } else {
       throw new Error('IMPORT_FORMAT_ERROR')
     }
