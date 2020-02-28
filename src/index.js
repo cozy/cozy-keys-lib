@@ -6,7 +6,8 @@ export { default as UriMatchType } from './UriMatchType'
 export {
   VaultContext,
   VaultProvider,
-  withVaultClient
+  withVaultClient,
+  useVaultClient
 } from './components/VaultContext'
 
 export VaultUnlocker from './components/VaultUnlocker'
