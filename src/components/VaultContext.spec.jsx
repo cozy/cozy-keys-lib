@@ -1,6 +1,13 @@
 import React from 'react'
 import { mount } from 'enzyme'
-import { VaultContext, VaultProvider, withVaultClient } from './VaultContext'
+import {
+  VaultContext,
+  VaultProvider,
+  withVaultClient,
+  useVaultClient
+} from './VaultContext'
+import WebVaultClient from '../WebVaultClient'
+import { renderHook } from '@testing-library/react-hooks'
 
 jest.mock('../WebVaultClient')
 
@@ -53,5 +60,15 @@ describe('withVaultClient', () => {
 
     const child = component.find(ChildComponent)
     expect(child.prop('vaultClient')).toBeDefined()
+  })
+})
+
+describe('useVaultClient', () => {
+  it('should return the vault client from the context', () => {
+    const wrapper = ({ children }) => (
+      <VaultProvider instance="test@example.com">{children}</VaultProvider>
+    )
+    const { result } = renderHook(() => useVaultClient(), { wrapper })
+    expect(result.current).toBeInstanceOf(WebVaultClient)
   })
 })

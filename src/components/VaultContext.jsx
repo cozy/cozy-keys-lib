@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import WebVaultClient from '../WebVaultClient'
 
@@ -83,4 +83,9 @@ const withVaultClient = BaseComponent => {
   return Component
 }
 
-export { VaultContext, VaultProvider, withVaultClient }
+const useVaultClient = () => {
+  const ctx = useContext(VaultContext)
+  return ctx.client
+}
+
+export { VaultContext, VaultProvider, withVaultClient, useVaultClient }
