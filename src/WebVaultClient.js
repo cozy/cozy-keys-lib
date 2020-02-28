@@ -38,6 +38,8 @@ import MemoryStorageService from './MemoryStorageService'
 
 import * as CozyUtils from './CozyUtils'
 
+import pLimit from 'p-limit'
+
 Utils.init()
 
 /**
@@ -772,68 +774,75 @@ class WebVaultClient {
         }
       }
 
-      for (let i = 0; i < parseResult.ciphers.length; ++i) {
-        const importingCipher = parseResult.ciphers[i]
-        let cipherToSave
-
-        let encryptedExistingCipher
-
-        // Since we search existing cipher by username, password and URI; and a
-        // cipher being imported can have multiple URIs, we have to look for an
-        // existing cipher for each URI. The getByIdOrSearch API may be better
-        // and accept an array of strings
-        for (const uri of importingCipher.login.uris) {
-          const search = {
-            username: importingCipher.login.username,
-            uri: uri._uri,
-            type: CipherType.Login
-          }
-
-          const sort = [
-            view => view.login.password === importingCipher.login.password,
-            'revisionDate'
-          ]
-
-          encryptedExistingCipher = await this.getByIdOrSearch(
-            null,
-            search,
-            sort
-          )
-
-          if (encryptedExistingCipher) {
-            break
-          }
-        }
-
-        if (encryptedExistingCipher) {
-          const decryptedExistingCipher = await this.decrypt(
-            encryptedExistingCipher
-          )
-
-          for (const uri of importingCipher.login.uris) {
-            const hasUri = decryptedExistingCipher.login.uris.find(
-              existingUri =>
-                existingUri.match === uri.match && existingUri.uri === uri.uri
-            )
-
-            if (!hasUri) {
-              decryptedExistingCipher.login.uris.push(uri)
-            }
-          }
-
-          cipherToSave = await this.createNewCipher(
-            decryptedExistingCipher,
-            encryptedExistingCipher
-          )
-        } else {
-          cipherToSave = await this.createNewCipher(importingCipher)
-        }
-
-        await this.saveCipher(cipherToSave)
-      }
+      const limit = pLimit(50)
+      const promises = parseResult.ciphers.map(cipher => async () =>
+        this.importCipher(cipher)
+      )
+      await Promise.all(promises.map(limit))
     } else {
       throw new Error('IMPORT_FORMAT_ERROR')
     }
+  }
+
+  /**
+   * Imports a single cipher in the vault
+   *
+   * @param {CipherView} cipher - the cipher to import
+   */
+  async importCipher(cipher) {
+    cipher.login.uris = cipher.login.uris || []
+
+    let cipherToSave
+    let encryptedExistingCipher
+
+    // Since we search existing cipher by username, password and URI; and a
+    // cipher being imported can have multiple URIs, we have to look for an
+    // existing cipher for each URI. The getByIdOrSearch API may be better
+    // and accept an array of strings
+    for (const uri of cipher.login.uris) {
+      const search = {
+        username: cipher.login.username,
+        uri: uri._uri,
+        type: CipherType.Login
+      }
+
+      const sort = [
+        view => view.login.password === cipher.login.password,
+        'revisionDate'
+      ]
+
+      encryptedExistingCipher = await this.getByIdOrSearch(null, search, sort)
+
+      if (encryptedExistingCipher) {
+        break
+      }
+    }
+
+    if (encryptedExistingCipher) {
+      const decryptedExistingCipher = await this.decrypt(
+        encryptedExistingCipher
+      )
+
+      for (const uri of cipher.login.uris) {
+        const hasUri = decryptedExistingCipher.login.uris.find(
+          existingUri =>
+            existingUri.match === uri.match && existingUri.uri === uri.uri
+        )
+
+        if (!hasUri) {
+          decryptedExistingCipher.login.uris.push(uri)
+        }
+      }
+
+      cipherToSave = await this.createNewCipher(
+        decryptedExistingCipher,
+        encryptedExistingCipher
+      )
+    } else {
+      cipherToSave = await this.createNewCipher(cipher)
+    }
+
+    await this.saveCipher(cipherToSave)
   }
 
   getImportOptions() {
