@@ -67,7 +67,7 @@
     "big-integer": "^1.6.44",
     "classnames": "^2.2.6",
     "cozy-device-helper": "^1.7.5",
-    "cozy-ui": "^29.9.1",
+    "cozy-ui": "^30.0.0",
     "lodash": "^4.17.15",
     "lunr": "^2.3.6",
     "microee": "^0.0.6",
