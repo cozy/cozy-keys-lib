@@ -1,5 +1,7 @@
 import WebVaultClient from './WebVaultClient'
 import { Utils } from './@bitwarden/jslib/misc/utils'
+import fs from 'fs'
+import path from 'path'
 
 jest.spyOn(Utils, 'init').mockImplementation(() => {})
 
@@ -117,36 +119,6 @@ describe('WebVaultClient', () => {
 
   describe('import', () => {
     const client = new WebVaultClient('https://me.cozy.wtf')
-    const fileContent = `{
-  "folders": [],
-  "items": [
-    {
-      "id": "04aa600a-fd2e-48f5-8560-aac6011f9cbd",
-      "organizationId": null,
-      "folderId": null,
-      "type": 1,
-      "name": "alan.com",
-      "notes": null,
-      "favorite": false,
-      "login": {
-        "uris": [
-          {
-            "match": null,
-            "uri": "https://alan.eu/login"
-          },
-          {
-            "match": null,
-            "uri": "https://alan.com"
-          }
-        ],
-        "username": "username",
-        "password": "password",
-        "totp": null
-      },
-      "collectionIds": null
-    }
-  ]
-}`
 
     jest
       .spyOn(client, 'createNewCipher')
@@ -194,6 +166,9 @@ describe('WebVaultClient', () => {
       })
 
       it("should add imported cipher's uris to existing cipher", async () => {
+        const fileContent = fs.readFileSync(
+          path.join(__dirname, './tests/exports/bitwarden.json')
+        )
         await client.import(fileContent, 'bitwardenjson')
         const savedUris = client.saveCipher.mock.calls[0][0].login.uris
 
@@ -208,15 +183,28 @@ describe('WebVaultClient', () => {
         client.getByIdOrSearch.mockResolvedValue(null)
       })
 
-      it('should create a new cipher', async () => {
-        await client.import(fileContent, 'bitwardenjson')
-        expect(client.createNewCipher).toHaveBeenCalledTimes(1)
-        expect(client.saveCipher).toHaveBeenCalledTimes(1)
-      })
+      const exportedPasswords = [
+        { filename: './tests/exports/bitwarden.json', format: 'bitwardenjson' },
+      ]
+
+      for (const exportedPassword of exportedPasswords) {
+        const { filename, format } = exportedPassword
+        it(`should create a new cipher [format: ${format}]`, async () => {
+          const fileContent = fs
+            .readFileSync(path.join(__dirname, filename))
+            .toString()
+          await client.import(fileContent, format)
+          expect(client.createNewCipher).toHaveBeenCalledTimes(1)
+          expect(client.saveCipher).toHaveBeenCalledTimes(1)
+        })
+      }
     })
 
     describe('when given an unknown format', () => {
       it('should throw an error', async () => {
+        const fileContent = fs.readFileSync(
+          path.join(__dirname, './tests/exports/bitwarden.json')
+        )
         await expect(
           client.import(fileContent, 'unknownformat')
         ).rejects.toThrow('IMPORT_UNKNOWN_FORMAT')
