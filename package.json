@@ -12,11 +12,10 @@
     "build:jslib:compile": "cd '@bitwarden/jslib' && cp -f ../../tsconfig.json . && npm install && npm run build",
     "build:jslib:copy": "mkdir -p 'src/@bitwarden' && rm -rf 'src/@bitwarden/jslib' && mv -f '@bitwarden/jslib/dist/src' 'src/@bitwarden/jslib'",
     "build:jslib": "yarn build:jslib:backup && yarn build:jslib:compile && yarn run build:jslib:copy && yarn build:jslib:restore",
-    "build:keys": "env BABEL_ENV=transpilation yarn babel src/ --out-dir transpiled && yarn run copy-files",
-    "copy-files": "cp -rf src/locales transpiled/",
+    "build:keys": "env BABEL_ENV=transpilation yarn babel src/ --out-dir transpiled --copy-files",
     "build": "yarn run build:keys && yarn run build:browser",
     "watch": "yarn watch:keys",
-    "watch:keys": "env BABEL_ENV=transpilation yarn babel src/ --out-dir transpiled --watch",
+    "watch:keys": "yarn build:keys --watch",
     "lint": "eslint 'src/**/*.{js,jsx}' 'playgrounds/src/**/*.{js,jsx}'",
     "test": "NODE_OPTIONS=\"--max-old-space-size=8192\" jest",
     "semantic-release": "semantic-release"
