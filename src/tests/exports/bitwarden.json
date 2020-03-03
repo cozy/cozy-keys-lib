@@ -1,0 +1,30 @@
+{
+  "folders": [],
+  "items": [
+    {
+      "id": "04aa600a-fd2e-48f5-8560-aac6011f9cbd",
+      "organizationId": null,
+      "folderId": null,
+      "type": 1,
+      "name": "alan.com",
+      "notes": null,
+      "favorite": false,
+      "login": {
+        "uris": [
+          {
+            "match": null,
+            "uri": "https://alan.eu/login"
+          },
+          {
+            "match": null,
+            "uri": "https://alan.com"
+          }
+        ],
+        "username": "username",
+        "password": "password",
+        "totp": null
+      },
+      "collectionIds": null
+    }
+  ]
+}

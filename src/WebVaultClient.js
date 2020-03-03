@@ -43,6 +43,13 @@ import pLimit from 'p-limit'
 Utils.init()
 
 /**
+ * Some password managers (Dashlane for example) can manage things
+ * that when imported do not have  the login field. We do not support
+ * them at the moment
+ */
+const isSupportedCipher = cipher => cipher.login
+
+/**
  * Password vault
  *
  * ```
@@ -775,9 +782,9 @@ class WebVaultClient {
       }
 
       const limit = pLimit(50)
-      const promises = parseResult.ciphers.map(cipher => async () =>
-        this.importCipher(cipher)
-      )
+      const promises = parseResult.ciphers
+        .filter(cipher => isSupportedCipher(cipher))
+        .map(cipher => async () => this.importCipher(cipher))
       await Promise.all(promises.map(limit))
     } else {
       throw new Error('IMPORT_FORMAT_ERROR')
