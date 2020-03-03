@@ -185,6 +185,8 @@ describe('WebVaultClient', () => {
 
       const exportedPasswords = [
         { filename: './tests/exports/bitwarden.json', format: 'bitwardenjson' },
+        { filename: './tests/exports/dashlane.json', format: 'dashlanejson' },
+        { filename: './tests/exports/googlechrome.csv', format: 'chromecsv' }
       ]
 
       for (const exportedPassword of exportedPasswords) {
