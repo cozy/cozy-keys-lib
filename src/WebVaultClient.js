@@ -676,6 +676,18 @@ class WebVaultClient {
   }
 
   /**
+   * Saves a new or modified (encrypted) ciphers to the server
+   * @param {Cipher} - cipher to save
+   */
+  async saveCiphers(ciphers) {
+    const limit = pLimit(50)
+    const promiseMakers = ciphers.map(cipher => async () => {
+      return this.saveCipher(cipher)
+    })
+    await Promise.all(promiseMakers.map(limit))
+  }
+
+  /**
    * Delete a cipher by its id
    * @param {string} id - uuid of the cipher
    */
@@ -752,6 +764,24 @@ class WebVaultClient {
   }
 
   /**
+   * Crude way to check if an import seems to have been done correctly
+   *
+   * Copy/pasted from ImportService::import
+   */
+  assertImportedCiphersSeemOK(importedCiphers) {
+    const halfway = Math.floor(importedCiphers.length / 2)
+    const last = importedCiphers.length - 1
+
+    if (
+      this.importService.badData(importedCiphers[0]) &&
+      this.importService.badData(importedCiphers[halfway]) &&
+      this.importService.badData(importedCiphers[last])
+    ) {
+      throw new Error('IMPORT_BAD_FILE_CONTENT')
+    }
+  }
+
+  /**
    * Import ciphers contained in a file in a given format
    *
    * @param {string} fileContent - the raw content of the file being imported
@@ -766,46 +796,29 @@ class WebVaultClient {
 
     const parseResult = await importer.parse(fileContent)
 
-    if (parseResult.success) {
-      // Error case copy/pasted from ImportService::import
-      if (parseResult.ciphers.length > 0) {
-        const halfway = Math.floor(parseResult.ciphers.length / 2)
-        const last = parseResult.ciphers.length - 1
-
-        if (
-          this.importService.badData(parseResult.ciphers[0]) &&
-          this.importService.badData(parseResult.ciphers[halfway]) &&
-          this.importService.badData(parseResult.ciphers[last])
-        ) {
-          throw new Error('IMPORT_BAD_FILE_CONTENT')
-        }
-      }
-
-      const limit = pLimit(50)
-      const promises = parseResult.ciphers
-        .filter(cipher => isSupportedCipher(cipher))
-        .map(cipher => async () => this.importCipher(cipher))
-      await Promise.all(promises.map(limit))
-    } else {
+    if (!parseResult.success) {
       throw new Error('IMPORT_FORMAT_ERROR')
     }
+
+    if (parseResult.ciphers.length > 0) {
+      this.assertImportedCiphersSeemOK(parseResult.ciphers)
+    }
+
+    const ciphersToSave = await Promise.all(
+      parseResult.ciphers
+        .filter(cipher => isSupportedCipher(cipher))
+        .map(cipher => this.prepareCipherToImport(cipher))
+    )
+
+    await this.saveCiphers(ciphersToSave)
   }
 
-  /**
-   * Imports a single cipher in the vault
-   *
-   * @param {CipherView} cipher - the cipher to import
-   */
-  async importCipher(cipher) {
-    cipher.login.uris = cipher.login.uris || []
-
-    let cipherToSave
+  async searchExistingCipher(cipher) {
     let encryptedExistingCipher
-
     // Since we search existing cipher by username, password and URI; and a
     // cipher being imported can have multiple URIs, we have to look for an
     // existing cipher for each URI. The getByIdOrSearch API may be better
-    // and accept an array of strings
+    // and accepts an array of strings
     for (const uri of cipher.login.uris) {
       const search = {
         username: cipher.login.username,
@@ -824,31 +837,56 @@ class WebVaultClient {
         break
       }
     }
+    return encryptedExistingCipher
+  }
+
+  async mergeCiphers(encryptedExistingCipher, cipher) {
+    const decryptedExistingCipher = await this.decrypt(encryptedExistingCipher)
+
+    for (const uri of cipher.login.uris) {
+      const hasUri = decryptedExistingCipher.login.uris.find(
+        existingUri =>
+          existingUri.match === uri.match && existingUri.uri === uri.uri
+      )
+
+      if (!hasUri) {
+        decryptedExistingCipher.login.uris.push(uri)
+      }
+    }
+
+    return await this.createNewCipher(
+      decryptedExistingCipher,
+      encryptedExistingCipher
+    )
+  }
+
+  /**
+   * Tries to find an existing cipher and merges given cipher into it
+   *
+   * The returned cipher has to be saved
+   */
+  async prepareCipherToImport(cipher) {
+    cipher.login.uris = cipher.login.uris || []
+
+    let cipherToSave
+    let encryptedExistingCipher = await this.searchExistingCipher(cipher)
 
     if (encryptedExistingCipher) {
-      const decryptedExistingCipher = await this.decrypt(
-        encryptedExistingCipher
-      )
-
-      for (const uri of cipher.login.uris) {
-        const hasUri = decryptedExistingCipher.login.uris.find(
-          existingUri =>
-            existingUri.match === uri.match && existingUri.uri === uri.uri
-        )
-
-        if (!hasUri) {
-          decryptedExistingCipher.login.uris.push(uri)
-        }
-      }
-
-      cipherToSave = await this.createNewCipher(
-        decryptedExistingCipher,
-        encryptedExistingCipher
-      )
+      cipherToSave = await this.mergeCiphers(encryptedExistingCipher, cipher)
     } else {
       cipherToSave = await this.createNewCipher(cipher)
     }
 
+    return cipherToSave
+  }
+
+  /**
+   * Imports a single cipher in the vault
+   *
+   * @param {CipherView} cipher - the cipher to import
+   */
+  async importCipher(cipher) {
+    const cipherToSave = await this.prepareCipherToImport(cipher)
     await this.saveCipher(cipherToSave)
   }
 
