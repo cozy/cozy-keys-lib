@@ -30,6 +30,7 @@ import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoF
 import { CipherType } from './@bitwarden/jslib/enums/cipherType'
 import { KdfType } from './@bitwarden/jslib/enums/kdfType'
 
+import { ImportCiphersRequest } from './@bitwarden/jslib/models/request/importCiphersRequest'
 import { KdfRequest } from './@bitwarden/jslib/models/request/kdfRequest'
 
 import WebPlatformUtilsService from './WebPlatformUtilsService'
@@ -37,8 +38,6 @@ import HtmlStorageService from './HtmlStorageService'
 import MemoryStorageService from './MemoryStorageService'
 
 import * as CozyUtils from './CozyUtils'
-
-import pLimit from 'p-limit'
 
 Utils.init()
 
@@ -195,6 +194,7 @@ class WebVaultClient {
       i18nService,
       collectionService
     )
+    this.apiService = apiService
     this.environmentService = environmentService
     this.authService = authService
     this.syncService = syncService
@@ -676,15 +676,15 @@ class WebVaultClient {
   }
 
   /**
-   * Saves a new or modified (encrypted) ciphers to the server
+   * Saves imported ciphers to the server
    * @param {Cipher} - cipher to save
    */
-  async saveCiphers(ciphers) {
-    const limit = pLimit(50)
-    const promiseMakers = ciphers.map(cipher => async () => {
-      return this.saveCipher(cipher)
+  async postImportCiphers(encryptedCiphersToSave) {
+    const req = new ImportCiphersRequest()
+    encryptedCiphersToSave.forEach(cipher => {
+      req.ciphers.push(cipher)
     })
-    await Promise.all(promiseMakers.map(limit))
+    return this.apiService.postImportCiphers(req)
   }
 
   /**
@@ -810,7 +810,7 @@ class WebVaultClient {
         .map(cipher => this.prepareCipherToImport(cipher))
     )
 
-    await this.saveCiphers(ciphersToSave)
+    await this.postImportCiphers(ciphersToSave)
   }
 
   async searchExistingCipher(cipher) {

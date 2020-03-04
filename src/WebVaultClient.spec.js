@@ -2,6 +2,7 @@ import WebVaultClient from './WebVaultClient'
 import { Utils } from './@bitwarden/jslib/misc/utils'
 import fs from 'fs'
 import path from 'path'
+import range from 'lodash/range'
 
 jest.spyOn(Utils, 'init').mockImplementation(() => {})
 
@@ -131,11 +132,16 @@ describe('WebVaultClient', () => {
     jest.spyOn(client, 'saveCipher').mockResolvedValue()
     jest.spyOn(client, 'getByIdOrSearch')
 
+    jest
+      .spyOn(client.apiService, 'postImportCiphers')
+      .mockImplementation(() => {})
+
     afterEach(() => {
       client.createNewCipher.mockClear()
       client.decrypt.mockClear()
       client.saveCipher.mockClear()
       client.getByIdOrSearch.mockReset()
+      client.apiService.postImportCiphers.mockReset()
     })
 
     describe('when the imported cipher already exists', () => {
@@ -170,11 +176,20 @@ describe('WebVaultClient', () => {
           path.join(__dirname, './tests/exports/bitwarden.json')
         )
         await client.import(fileContent, 'bitwardenjson')
-        const savedUris = client.saveCipher.mock.calls[0][0].login.uris
-
-        expect(savedUris).toHaveLength(2)
-        expect(savedUris[0].uri).toBe('https://alan.eu/login')
-        expect(savedUris[1].uri).toBe('https://alan.com')
+        expect(client.apiService.postImportCiphers).toHaveBeenCalledWith(
+          expect.objectContaining({
+            ciphers: [
+              expect.objectContaining({
+                login: expect.objectContaining({
+                  uris: [
+                    expect.objectContaining({ uri: 'https://alan.eu/login' }),
+                    expect.objectContaining({ _uri: 'https://alan.com' })
+                  ]
+                })
+              })
+            ]
+          })
+        )
       })
     })
 
@@ -184,20 +199,43 @@ describe('WebVaultClient', () => {
       })
 
       const exportedPasswords = [
-        { filename: './tests/exports/bitwarden.json', format: 'bitwardenjson' },
-        { filename: './tests/exports/dashlane.json', format: 'dashlanejson' },
-        { filename: './tests/exports/googlechrome.csv', format: 'chromecsv' }
+        {
+          filename: './tests/exports/bitwarden.json',
+          format: 'bitwardenjson',
+          nbCiphers: 1
+        },
+        {
+          filename: './tests/exports/dashlane.json',
+          format: 'dashlanejson',
+          nbCiphers: 1
+        },
+        {
+          filename: './tests/exports/googlechrome.csv',
+          format: 'chromecsv',
+          nbCiphers: 1
+        },
+        {
+          filename: './tests/exports/keepass.csv',
+          format: 'keepassxcsv',
+          nbCiphers: 2
+        }
       ]
 
+      afterEach(() => {})
+
       for (const exportedPassword of exportedPasswords) {
-        const { filename, format } = exportedPassword
+        const { filename, format, nbCiphers } = exportedPassword
         it(`should create a new cipher [format: ${format}]`, async () => {
           const fileContent = fs
             .readFileSync(path.join(__dirname, filename))
             .toString()
           await client.import(fileContent, format)
-          expect(client.createNewCipher).toHaveBeenCalledTimes(1)
-          expect(client.saveCipher).toHaveBeenCalledTimes(1)
+          expect(client.createNewCipher).toHaveBeenCalledTimes(nbCiphers)
+          expect(client.apiService.postImportCiphers).toHaveBeenCalledWith(
+            expect.objectContaining({
+              ciphers: range(nbCiphers).map(() => expect.any(Object))
+            })
+          )
         })
       }
     })
