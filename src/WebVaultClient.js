@@ -784,25 +784,25 @@ class WebVaultClient {
 
     const parseResult = await importer.parse(fileContent)
 
-    if (parseResult.success) {
-      if (parseResult.ciphers.length > 0) {
-        this.assertImportedCiphersSeemOK(parseResult.ciphers)
-      }
-
-      const ciphersToSave = await Promise.all(
-        parseResult.ciphers
-          .filter(cipher => isSupportedCipher(cipher))
-          .map(cipher => this.prepareCipherToImport(cipher))
-      )
-
-      const limit = pLimit(50)
-      const promiseMakers = ciphersToSave.map(cipher => async () => {
-        return this.saveCipher(cipher)
-      })
-      await Promise.all(promiseMakers.map(limit))
-    } else {
+    if (!parseResult.success) {
       throw new Error('IMPORT_FORMAT_ERROR')
     }
+
+    if (parseResult.ciphers.length > 0) {
+      this.assertImportedCiphersSeemOK(parseResult.ciphers)
+    }
+
+    const ciphersToSave = await Promise.all(
+      parseResult.ciphers
+        .filter(cipher => isSupportedCipher(cipher))
+        .map(cipher => this.prepareCipherToImport(cipher))
+    )
+
+    const limit = pLimit(50)
+    const promiseMakers = ciphersToSave.map(cipher => async () => {
+      return this.saveCipher(cipher)
+    })
+    await Promise.all(promiseMakers.map(limit))
   }
 
   async searchExistingCipher(cipher) {
