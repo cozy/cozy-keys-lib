@@ -752,6 +752,24 @@ class WebVaultClient {
   }
 
   /**
+   * Crude way to check if an import seems to have been done correctly
+   *
+   * Copy/pasted from ImportService::import
+   */
+  assertImportedCiphersSeemOK(importedCiphers) {
+    const halfway = Math.floor(importedCiphers.length / 2)
+    const last = importedCiphers.length - 1
+
+    if (
+      this.importService.badData(importedCiphers[0]) &&
+      this.importService.badData(importedCiphers[halfway]) &&
+      this.importService.badData(importedCiphers[last])
+    ) {
+      throw new Error('IMPORT_BAD_FILE_CONTENT')
+    }
+  }
+
+  /**
    * Import ciphers contained in a file in a given format
    *
    * @param {string} fileContent - the raw content of the file being imported
@@ -767,18 +785,8 @@ class WebVaultClient {
     const parseResult = await importer.parse(fileContent)
 
     if (parseResult.success) {
-      // Error case copy/pasted from ImportService::import
       if (parseResult.ciphers.length > 0) {
-        const halfway = Math.floor(parseResult.ciphers.length / 2)
-        const last = parseResult.ciphers.length - 1
-
-        if (
-          this.importService.badData(parseResult.ciphers[0]) &&
-          this.importService.badData(parseResult.ciphers[halfway]) &&
-          this.importService.badData(parseResult.ciphers[last])
-        ) {
-          throw new Error('IMPORT_BAD_FILE_CONTENT')
-        }
+        this.assertImportedCiphersSeemOK(parseResult.ciphers)
       }
 
       const ciphersToSave = await Promise.all(
