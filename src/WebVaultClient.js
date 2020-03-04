@@ -31,6 +31,7 @@ import { CipherType } from './@bitwarden/jslib/enums/cipherType'
 import { KdfType } from './@bitwarden/jslib/enums/kdfType'
 
 import { ImportCiphersRequest } from './@bitwarden/jslib/models/request/importCiphersRequest'
+import { CipherRequest } from './@bitwarden/jslib/models/request/cipherRequest'
 import { KdfRequest } from './@bitwarden/jslib/models/request/kdfRequest'
 
 import WebPlatformUtilsService from './WebPlatformUtilsService'
@@ -682,7 +683,7 @@ class WebVaultClient {
   async postImportCiphers(encryptedCiphersToSave) {
     const req = new ImportCiphersRequest()
     encryptedCiphersToSave.forEach(cipher => {
-      req.ciphers.push(cipher)
+      req.ciphers.push(new CipherRequest(cipher))
     })
     return this.apiService.postImportCiphers(req)
   }
