@@ -676,6 +676,18 @@ class WebVaultClient {
   }
 
   /**
+   * Saves a new or modified (encrypted) ciphers to the server
+   * @param {Cipher} - cipher to save
+   */
+  async saveCiphers(ciphers) {
+    const limit = pLimit(50)
+    const promiseMakers = ciphers.map(cipher => async () => {
+      return this.saveCipher(cipher)
+    })
+    await Promise.all(promiseMakers.map(limit))
+  }
+
+  /**
    * Delete a cipher by its id
    * @param {string} id - uuid of the cipher
    */
@@ -798,11 +810,7 @@ class WebVaultClient {
         .map(cipher => this.prepareCipherToImport(cipher))
     )
 
-    const limit = pLimit(50)
-    const promiseMakers = ciphersToSave.map(cipher => async () => {
-      return this.saveCipher(cipher)
-    })
-    await Promise.all(promiseMakers.map(limit))
+    await this.saveCiphers(ciphersToSave)
   }
 
   async searchExistingCipher(cipher) {
