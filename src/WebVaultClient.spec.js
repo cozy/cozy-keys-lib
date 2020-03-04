@@ -121,9 +121,22 @@ describe('WebVaultClient', () => {
   describe('import', () => {
     const client = new WebVaultClient('https://me.cozy.wtf')
 
-    jest
-      .spyOn(client, 'createNewCipher')
-      .mockImplementation(cipher => Promise.resolve(cipher))
+    const fakeEncrypt = value => ({
+      encryptedString: `encrypted<${value}>`
+    })
+    jest.spyOn(client, 'createNewCipher').mockImplementation(cipher =>
+      Promise.resolve({
+        ...cipher,
+        login: {
+          username: fakeEncrypt(cipher.login.username),
+          password: fakeEncrypt(cipher.login.password),
+          uris: cipher.login.uris.map(x => ({
+            ...x,
+            uri: fakeEncrypt(x.uri)
+          }))
+        }
+      })
+    )
 
     jest
       .spyOn(client, 'decrypt')
@@ -182,8 +195,12 @@ describe('WebVaultClient', () => {
               expect.objectContaining({
                 login: expect.objectContaining({
                   uris: [
-                    expect.objectContaining({ uri: 'https://alan.eu/login' }),
-                    expect.objectContaining({ _uri: 'https://alan.com' })
+                    expect.objectContaining({
+                      uri: 'encrypted<https://alan.eu/login>'
+                    }),
+                    expect.objectContaining({
+                      uri: 'encrypted<https://alan.com>'
+                    })
                   ]
                 })
               })
