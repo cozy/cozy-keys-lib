@@ -781,31 +781,28 @@ class WebVaultClient {
         }
       }
 
+      const ciphersToSave = await Promise.all(
+        parseResult.ciphers
+          .filter(cipher => isSupportedCipher(cipher))
+          .map(cipher => this.prepareCipherToImport(cipher))
+      )
+
       const limit = pLimit(50)
-      const promises = parseResult.ciphers
-        .filter(cipher => isSupportedCipher(cipher))
-        .map(cipher => async () => this.importCipher(cipher))
-      await Promise.all(promises.map(limit))
+      const promiseMakers = ciphersToSave.map(cipher => async () => {
+        return this.saveCipher(cipher)
+      })
+      await Promise.all(promiseMakers.map(limit))
     } else {
       throw new Error('IMPORT_FORMAT_ERROR')
     }
   }
 
-  /**
-   * Imports a single cipher in the vault
-   *
-   * @param {CipherView} cipher - the cipher to import
-   */
-  async importCipher(cipher) {
-    cipher.login.uris = cipher.login.uris || []
-
-    let cipherToSave
+  async searchExistingCipher(cipher) {
     let encryptedExistingCipher
-
     // Since we search existing cipher by username, password and URI; and a
     // cipher being imported can have multiple URIs, we have to look for an
     // existing cipher for each URI. The getByIdOrSearch API may be better
-    // and accept an array of strings
+    // and accepts an array of strings
     for (const uri of cipher.login.uris) {
       const search = {
         username: cipher.login.username,
@@ -824,31 +821,56 @@ class WebVaultClient {
         break
       }
     }
+    return encryptedExistingCipher
+  }
+
+  async mergeCiphers(encryptedExistingCipher, cipher) {
+    const decryptedExistingCipher = await this.decrypt(encryptedExistingCipher)
+
+    for (const uri of cipher.login.uris) {
+      const hasUri = decryptedExistingCipher.login.uris.find(
+        existingUri =>
+          existingUri.match === uri.match && existingUri.uri === uri.uri
+      )
+
+      if (!hasUri) {
+        decryptedExistingCipher.login.uris.push(uri)
+      }
+    }
+
+    return await this.createNewCipher(
+      decryptedExistingCipher,
+      encryptedExistingCipher
+    )
+  }
+
+  /**
+   * Tries to find an existing cipher and merges given cipher into it
+   *
+   * The returned cipher has to be saved
+   */
+  async prepareCipherToImport(cipher) {
+    cipher.login.uris = cipher.login.uris || []
+
+    let cipherToSave
+    let encryptedExistingCipher = await this.searchExistingCipher(cipher)
 
     if (encryptedExistingCipher) {
-      const decryptedExistingCipher = await this.decrypt(
-        encryptedExistingCipher
-      )
-
-      for (const uri of cipher.login.uris) {
-        const hasUri = decryptedExistingCipher.login.uris.find(
-          existingUri =>
-            existingUri.match === uri.match && existingUri.uri === uri.uri
-        )
-
-        if (!hasUri) {
-          decryptedExistingCipher.login.uris.push(uri)
-        }
-      }
-
-      cipherToSave = await this.createNewCipher(
-        decryptedExistingCipher,
-        encryptedExistingCipher
-      )
+      cipherToSave = await this.mergeCiphers(encryptedExistingCipher, cipher)
     } else {
       cipherToSave = await this.createNewCipher(cipher)
     }
 
+    return cipherToSave
+  }
+
+  /**
+   * Imports a single cipher in the vault
+   *
+   * @param {CipherView} cipher - the cipher to import
+   */
+  async importCipher(cipher) {
+    const cipherToSave = await this.prepareCipherToImport(cipher)
     await this.saveCipher(cipherToSave)
   }
 
