@@ -859,17 +859,22 @@ class WebVaultClient {
       }
 
       const sort = [
-        view => view.login.password === cipher.login.password,
+        cipherView =>
+          cipherView.login.password === cipher.login.password ? 0 : 1,
         'revisionDate'
       ]
 
       encryptedExistingCipher = await this.getByIdOrSearch(null, search, sort)
 
       if (encryptedExistingCipher) {
-        break
+        const decrypted = await this.decrypt(encryptedExistingCipher)
+        if (decrypted.login.password == cipher.login.password) {
+          return encryptedExistingCipher
+        } else {
+          logger.debug('Passwords are different')
+        }
       }
     }
-    return encryptedExistingCipher
   }
 
   async mergeCiphers(encryptedExistingCipher, cipher) {
