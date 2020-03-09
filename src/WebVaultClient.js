@@ -747,7 +747,7 @@ class WebVaultClient {
    * @param {object} decryptedData
    * @return {Cipher}
    */
-  async createNewCipher(decryptedData, originalCipher = null) {
+  async createOrUpdateCipher(decryptedData, originalCipher = null) {
     this.attachToGlobal()
     const orgId = decryptedData.organizationId
     const key = await (orgId
@@ -767,7 +767,7 @@ class WebVaultClient {
     const colIds = cols.map(col => col.id)
     decryptedData.organizationId = org.id
     decryptedData.collectionIds = colIds
-    return this.createNewCipher(decryptedData, originalCipher)
+    return this.createOrUpdateCipher(decryptedData, originalCipher)
   }
 
   /**
@@ -861,10 +861,11 @@ class WebVaultClient {
       }
     }
 
-    return await this.createNewCipher(
+    const mergedCipher = await this.createOrUpdateCipher(
       decryptedExistingCipher,
       encryptedExistingCipher
     )
+    return mergedCipher
   }
 
   /**
@@ -881,7 +882,7 @@ class WebVaultClient {
     if (encryptedExistingCipher) {
       cipherToSave = await this.mergeCiphers(encryptedExistingCipher, cipher)
     } else {
-      cipherToSave = await this.createNewCipher(cipher)
+      cipherToSave = await this.createOrUpdateCipher(cipher)
     }
 
     return cipherToSave

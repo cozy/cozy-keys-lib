@@ -124,7 +124,7 @@ describe('WebVaultClient', () => {
     const fakeEncrypt = value => ({
       encryptedString: `encrypted<${value}>`
     })
-    jest.spyOn(client, 'createNewCipher').mockImplementation(cipher =>
+    jest.spyOn(client, 'createOrUpdateCipher').mockImplementation(cipher =>
       Promise.resolve({
         ...cipher,
         login: {
@@ -150,7 +150,7 @@ describe('WebVaultClient', () => {
       .mockImplementation(() => {})
 
     afterEach(() => {
-      client.createNewCipher.mockClear()
+      client.createOrUpdateCipher.mockClear()
       client.decrypt.mockClear()
       client.saveCipher.mockClear()
       client.getByIdOrSearch.mockReset()
@@ -247,7 +247,7 @@ describe('WebVaultClient', () => {
             .readFileSync(path.join(__dirname, filename))
             .toString()
           await client.import(fileContent, format)
-          expect(client.createNewCipher).toHaveBeenCalledTimes(nbCiphers)
+          expect(client.createOrUpdateCipher).toHaveBeenCalledTimes(nbCiphers)
           expect(client.apiService.postImportCiphers).toHaveBeenCalledWith(
             expect.objectContaining({
               ciphers: range(nbCiphers).map(() => expect.any(Object))
