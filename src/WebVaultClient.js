@@ -235,8 +235,14 @@ class WebVaultClient {
    * @private
    */
   attachToGlobal() {
-    // Utils.global.bitwardenContainerService is used by the bitwarden jslib to decrypt data. It is important that it is set to the current instance before running any code that involves crypto, especially when there are multiple WebVaultCLient instances on the page.
-    // There are legitimate use cases for creating multiple client instances over the lifetime of a page. For example, the client can be created by the VaultContext component, and this component could be mounted and unmounted several times by a react app.
+    // Utils.global.bitwardenContainerService is used by the bitwarden jslib
+    // to decrypt data. It is important that it is set to the current instance
+    // before running any code that involves crypto, especially when there are
+    // multiple WebVaultClient instances on the page. There are legitimate use
+    // cases for creating multiple client instances over the lifetime of a
+    // page. For example, the client can be created by the VaultContext
+    // component, and this component could be mounted and unmounted several
+    // times by a react app.
     Utils.global.bitwardenContainerService = this.containerService
   }
 
