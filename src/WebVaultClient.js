@@ -811,13 +811,15 @@ class WebVaultClient {
       this.assertImportedCiphersSeemOK(parseResult.ciphers)
     }
 
+    const supportedCiphers = parseResult.ciphers.filter(cipher =>
+      isSupportedCipher(cipher)
+    )
     const ciphersToSave = await Promise.all(
-      parseResult.ciphers
-        .filter(cipher => isSupportedCipher(cipher))
-        .map(cipher => this.prepareCipherToImport(cipher))
+      supportedCiphers.map(cipher => this.prepareCipherToImport(cipher))
     )
 
-    await this.postImportCiphers(ciphersToSave)
+    const res = await this.postImportCiphers(ciphersToSave)
+    return res
   }
 
   async searchExistingCipher(cipher) {
