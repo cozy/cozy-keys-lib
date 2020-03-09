@@ -837,6 +837,8 @@ class WebVaultClient {
     const supportedCiphers = parseResult.ciphers.filter(cipher =>
       isSupportedCipher(cipher)
     )
+    logger.info(`Parsed ${parseResult.ciphers.length}`)
+    logger.info(`Importing ${supportedCiphers.length} supported ciphers`)
     const ciphersToSave = await Promise.all(
       supportedCiphers.map(cipher => this.prepareCipherToImport(cipher))
     )
@@ -858,6 +860,7 @@ class WebVaultClient {
         type: CipherType.Login
       }
 
+      logger.debug('Searching existing cipher with', search)
       const sort = [
         cipherView =>
           cipherView.login.password === cipher.login.password ? 0 : 1,
@@ -865,10 +868,12 @@ class WebVaultClient {
       ]
 
       encryptedExistingCipher = await this.getByIdOrSearch(null, search, sort)
+      logger.debug('Found potential matching cipher', encryptedExistingCipher)
 
       if (encryptedExistingCipher) {
         const decrypted = await this.decrypt(encryptedExistingCipher)
         if (decrypted.login.password == cipher.login.password) {
+          logger.debug('Passwords are identical !')
           return encryptedExistingCipher
         } else {
           logger.debug('Passwords are different')
@@ -891,10 +896,12 @@ class WebVaultClient {
       }
     }
 
+    logger.info('Merging ciphers', decryptedExistingCipher, cipher)
     const mergedCipher = await this.createOrUpdateCipher(
       decryptedExistingCipher,
       encryptedExistingCipher
     )
+    logger.info('Merge result', mergedCipher)
     return mergedCipher
   }
 
@@ -904,14 +911,17 @@ class WebVaultClient {
    * The returned cipher has to be saved
    */
   async prepareCipherToImport(cipher) {
+    logger.info('Preparing cipher to import')
     cipher.login.uris = cipher.login.uris || []
 
     let cipherToSave
     let encryptedExistingCipher = await this.searchExistingCipher(cipher)
 
     if (encryptedExistingCipher) {
+      logger.info('Found existing cipher')
       cipherToSave = await this.mergeCiphers(encryptedExistingCipher, cipher)
     } else {
+      logger.info('Creating a new cipher')
       cipherToSave = await this.createOrUpdateCipher(cipher)
     }
 
