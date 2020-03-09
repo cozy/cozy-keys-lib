@@ -189,22 +189,20 @@ describe('WebVaultClient', () => {
           path.join(__dirname, './tests/exports/bitwarden.json')
         )
         await client.import(fileContent, 'bitwardenjson')
-        expect(client.apiService.postImportCiphers).toHaveBeenCalledWith(
+        expect(client.saveCipher).toHaveBeenCalledWith(
           expect.objectContaining({
-            ciphers: [
-              expect.objectContaining({
-                login: expect.objectContaining({
-                  uris: [
-                    expect.objectContaining({
-                      uri: 'encrypted<https://alan.eu/login>'
-                    }),
-                    expect.objectContaining({
-                      uri: 'encrypted<https://alan.com>'
-                    })
-                  ]
+            login: expect.objectContaining({
+              uris: [
+                'encrypted<https://alan.eu/login>',
+                'encrypted<https://alan.com>'
+              ].map(encryptedURI =>
+                expect.objectContaining({
+                  uri: {
+                    encryptedString: encryptedURI
+                  }
                 })
-              })
-            ]
+              )
+            })
           })
         )
       })

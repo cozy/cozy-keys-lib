@@ -3,6 +3,7 @@ import MicroEE from 'microee'
 import eq from 'lodash/eq'
 import get from 'lodash/get'
 import orderBy from 'lodash/orderBy'
+import groupBy from 'lodash/groupBy'
 
 import { Utils } from './@bitwarden/jslib/misc/utils'
 
@@ -39,6 +40,7 @@ import HtmlStorageService from './HtmlStorageService'
 import MemoryStorageService from './MemoryStorageService'
 
 import * as CozyUtils from './CozyUtils'
+import logger from './logger'
 
 Utils.init()
 
@@ -687,11 +689,32 @@ class WebVaultClient {
    * @param {Cipher} - cipher to save
    */
   async postImportCiphers(encryptedCiphersToSave) {
-    const req = new ImportCiphersRequest()
-    encryptedCiphersToSave.forEach(cipher => {
-      req.ciphers.push(new CipherRequest(cipher))
-    })
-    return this.apiService.postImportCiphers(req)
+    const {
+      true: existingCiphersToSave = [],
+      false: newCiphersToSave = []
+    } = groupBy(encryptedCiphersToSave, x => Boolean(x.id))
+
+    if (newCiphersToSave.length > 0) {
+      logger.info(`Bulk import of ${newCiphersToSave.length} ciphers`)
+      const req = new ImportCiphersRequest()
+      newCiphersToSave.forEach(cipher => {
+        const cipherReq = new CipherRequest(cipher)
+        req.ciphers.push(cipherReq)
+      })
+      await this.apiService.postImportCiphers(req)
+    }
+
+    if (existingCiphersToSave.length > 0) {
+      logger.info(`1 by 1 import of ${existingCiphersToSave.length} ciphers`)
+      for (let existingCipherToSave of existingCiphersToSave) {
+        await this.saveCipher(existingCipherToSave)
+      }
+    }
+
+    return {
+      nbNewCiphers: newCiphersToSave.length,
+      nbUpdatedCiphers: existingCiphersToSave.length
+    }
   }
 
   /**
