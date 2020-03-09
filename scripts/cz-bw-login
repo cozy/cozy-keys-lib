@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -euxo pipefail
+
+baseurl=$1
+domain=$(echo $baseurl | sed s-https://-- | sed s-http://--)
+
+bw config server ${baseurl}/bitwarden
+bw login me@${domain}
