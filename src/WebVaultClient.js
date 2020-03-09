@@ -766,8 +766,14 @@ class WebVaultClient {
   }
 
   /**
-   * Create a new (encrypted) cipher from a js object
+   * Create a new (encrypted) cipher from an object.
+   *
+   * Handles organisation encrypting automatically: if the decryptedData has
+   * an organisationId, the new cipher will be ciphered with the organisation
+   * key of the organisation
+   *
    * @param {object} decryptedData
+   * @param {object} originalCipher
    * @return {Cipher}
    */
   async createOrUpdateCipher(decryptedData, originalCipher = null) {
