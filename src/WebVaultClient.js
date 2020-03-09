@@ -849,8 +849,12 @@ class WebVaultClient {
       supportedCiphers.map(cipher => this.prepareCipherToImport(cipher))
     )
 
-    const res = await this.postImportCiphers(ciphersToSave)
-    return res
+    const postImportRes = await this.postImportCiphers(ciphersToSave)
+    return {
+      ...postImportRes,
+      nbParsedCiphers: parseResult.ciphers.length,
+      nbSupportedCiphers: supportedCiphers.length
+    }
   }
 
   async searchExistingCipher(cipher) {
