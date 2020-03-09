@@ -1,6 +1,25 @@
 #!/bin/sh
 
-set -euxo pipefail
+function usage {
+  echo "usage: cz-bw-login https://myexample.mycozy.cloud"
+  echo ""
+  echo "Utility to configure and login to a Cozy's bitwarden vault."
+  echo "You need to have the Cozy's master password to be able to connect"
+  echo "to a Cozy's vault."
+  echo "This can be used to programatically access the vault through"
+  echo "bitwarden's CLI, for example to remove all ciphers or view debug information."
+  echo ""
+  echo "Bitwarden CLI is available from https://github.com/bitwarden/cli"
+  exit 0
+}
+
+set -euo pipefail
+
+maybehelp=${1:-"-h"}
+
+if [[ $maybehelp == "--help" || $maybehelp == "-h" ]]; then
+  usage
+fi;
 
 baseurl=$1
 domain=$(echo $baseurl | sed s-https://-- | sed s-http://--)
