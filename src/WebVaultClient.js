@@ -3,6 +3,7 @@ import MicroEE from 'microee'
 import eq from 'lodash/eq'
 import get from 'lodash/get'
 import orderBy from 'lodash/orderBy'
+import groupBy from 'lodash/groupBy'
 
 import { Utils } from './@bitwarden/jslib/misc/utils'
 
@@ -39,6 +40,7 @@ import HtmlStorageService from './HtmlStorageService'
 import MemoryStorageService from './MemoryStorageService'
 
 import * as CozyUtils from './CozyUtils'
+import logger from './logger'
 
 Utils.init()
 
@@ -235,8 +237,14 @@ class WebVaultClient {
    * @private
    */
   attachToGlobal() {
-    // Utils.global.bitwardenContainerService is used by the bitwarden jslib to decrypt data. It is important that it is set to the current instance before running any code that involves crypto, especially when there are multiple WebVaultCLient instances on the page.
-    // There are legitimate use cases for creating multiple client instances over the lifetime of a page. For example, the client can be created by the VaultContext component, and this component could be mounted and unmounted several times by a react app.
+    // Utils.global.bitwardenContainerService is used by the bitwarden jslib
+    // to decrypt data. It is important that it is set to the current instance
+    // before running any code that involves crypto, especially when there are
+    // multiple WebVaultClient instances on the page. There are legitimate use
+    // cases for creating multiple client instances over the lifetime of a
+    // page. For example, the client can be created by the VaultContext
+    // component, and this component could be mounted and unmounted several
+    // times by a react app.
     Utils.global.bitwardenContainerService = this.containerService
   }
 
@@ -681,11 +689,32 @@ class WebVaultClient {
    * @param {Cipher} - cipher to save
    */
   async postImportCiphers(encryptedCiphersToSave) {
-    const req = new ImportCiphersRequest()
-    encryptedCiphersToSave.forEach(cipher => {
-      req.ciphers.push(new CipherRequest(cipher))
-    })
-    return this.apiService.postImportCiphers(req)
+    const {
+      true: existingCiphersToSave = [],
+      false: newCiphersToSave = []
+    } = groupBy(encryptedCiphersToSave, x => Boolean(x.id))
+
+    if (newCiphersToSave.length > 0) {
+      logger.info(`Bulk import of ${newCiphersToSave.length} ciphers`)
+      const req = new ImportCiphersRequest()
+      newCiphersToSave.forEach(cipher => {
+        const cipherReq = new CipherRequest(cipher)
+        req.ciphers.push(cipherReq)
+      })
+      await this.apiService.postImportCiphers(req)
+    }
+
+    if (existingCiphersToSave.length > 0) {
+      logger.info(`1 by 1 import of ${existingCiphersToSave.length} ciphers`)
+      for (let existingCipherToSave of existingCiphersToSave) {
+        await this.saveCipher(existingCipherToSave)
+      }
+    }
+
+    return {
+      nbNewCiphers: newCiphersToSave.length,
+      nbUpdatedCiphers: existingCiphersToSave.length
+    }
   }
 
   /**
@@ -737,11 +766,17 @@ class WebVaultClient {
   }
 
   /**
-   * Create a new (encrypted) cipher from a js object
+   * Create a new (encrypted) cipher from an object.
+   *
+   * Handles organisation encrypting automatically: if the decryptedData has
+   * an organisationId, the new cipher will be ciphered with the organisation
+   * key of the organisation
+   *
    * @param {object} decryptedData
+   * @param {object} originalCipher
    * @return {Cipher}
    */
-  async createNewCipher(decryptedData, originalCipher = null) {
+  async createOrUpdateCipher(decryptedData, originalCipher = null) {
     this.attachToGlobal()
     const orgId = decryptedData.organizationId
     const key = await (orgId
@@ -761,7 +796,7 @@ class WebVaultClient {
     const colIds = cols.map(col => col.id)
     decryptedData.organizationId = org.id
     decryptedData.collectionIds = colIds
-    return this.createNewCipher(decryptedData, originalCipher)
+    return this.createOrUpdateCipher(decryptedData, originalCipher)
   }
 
   /**
@@ -805,13 +840,21 @@ class WebVaultClient {
       this.assertImportedCiphersSeemOK(parseResult.ciphers)
     }
 
+    const supportedCiphers = parseResult.ciphers.filter(cipher =>
+      isSupportedCipher(cipher)
+    )
+    logger.info(`Parsed ${parseResult.ciphers.length}`)
+    logger.info(`Importing ${supportedCiphers.length} supported ciphers`)
     const ciphersToSave = await Promise.all(
-      parseResult.ciphers
-        .filter(cipher => isSupportedCipher(cipher))
-        .map(cipher => this.prepareCipherToImport(cipher))
+      supportedCiphers.map(cipher => this.prepareCipherToImport(cipher))
     )
 
-    await this.postImportCiphers(ciphersToSave)
+    const postImportRes = await this.postImportCiphers(ciphersToSave)
+    return {
+      ...postImportRes,
+      nbParsedCiphers: parseResult.ciphers.length,
+      nbSupportedCiphers: supportedCiphers.length
+    }
   }
 
   async searchExistingCipher(cipher) {
@@ -827,18 +870,26 @@ class WebVaultClient {
         type: CipherType.Login
       }
 
+      logger.debug('Searching existing cipher with', search)
       const sort = [
-        view => view.login.password === cipher.login.password,
+        cipherView =>
+          cipherView.login.password === cipher.login.password ? 0 : 1,
         'revisionDate'
       ]
 
       encryptedExistingCipher = await this.getByIdOrSearch(null, search, sort)
+      logger.debug('Found potential matching cipher', encryptedExistingCipher)
 
       if (encryptedExistingCipher) {
-        break
+        const decrypted = await this.decrypt(encryptedExistingCipher)
+        if (decrypted.login.password == cipher.login.password) {
+          logger.debug('Passwords are identical !')
+          return encryptedExistingCipher
+        } else {
+          logger.debug('Passwords are different')
+        }
       }
     }
-    return encryptedExistingCipher
   }
 
   async mergeCiphers(encryptedExistingCipher, cipher) {
@@ -855,10 +906,13 @@ class WebVaultClient {
       }
     }
 
-    return await this.createNewCipher(
+    logger.info('Merging ciphers', decryptedExistingCipher, cipher)
+    const mergedCipher = await this.createOrUpdateCipher(
       decryptedExistingCipher,
       encryptedExistingCipher
     )
+    logger.info('Merge result', mergedCipher)
+    return mergedCipher
   }
 
   /**
@@ -867,15 +921,18 @@ class WebVaultClient {
    * The returned cipher has to be saved
    */
   async prepareCipherToImport(cipher) {
+    logger.info('Preparing cipher to import')
     cipher.login.uris = cipher.login.uris || []
 
     let cipherToSave
     let encryptedExistingCipher = await this.searchExistingCipher(cipher)
 
     if (encryptedExistingCipher) {
+      logger.info('Found existing cipher')
       cipherToSave = await this.mergeCiphers(encryptedExistingCipher, cipher)
     } else {
-      cipherToSave = await this.createNewCipher(cipher)
+      logger.info('Creating a new cipher')
+      cipherToSave = await this.createOrUpdateCipher(cipher)
     }
 
     return cipherToSave

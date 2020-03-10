@@ -124,7 +124,7 @@ describe('WebVaultClient', () => {
     const fakeEncrypt = value => ({
       encryptedString: `encrypted<${value}>`
     })
-    jest.spyOn(client, 'createNewCipher').mockImplementation(cipher =>
+    jest.spyOn(client, 'createOrUpdateCipher').mockImplementation(cipher =>
       Promise.resolve({
         ...cipher,
         login: {
@@ -150,7 +150,7 @@ describe('WebVaultClient', () => {
       .mockImplementation(() => {})
 
     afterEach(() => {
-      client.createNewCipher.mockClear()
+      client.createOrUpdateCipher.mockClear()
       client.decrypt.mockClear()
       client.saveCipher.mockClear()
       client.getByIdOrSearch.mockReset()
@@ -189,22 +189,20 @@ describe('WebVaultClient', () => {
           path.join(__dirname, './tests/exports/bitwarden.json')
         )
         await client.import(fileContent, 'bitwardenjson')
-        expect(client.apiService.postImportCiphers).toHaveBeenCalledWith(
+        expect(client.saveCipher).toHaveBeenCalledWith(
           expect.objectContaining({
-            ciphers: [
-              expect.objectContaining({
-                login: expect.objectContaining({
-                  uris: [
-                    expect.objectContaining({
-                      uri: 'encrypted<https://alan.eu/login>'
-                    }),
-                    expect.objectContaining({
-                      uri: 'encrypted<https://alan.com>'
-                    })
-                  ]
+            login: expect.objectContaining({
+              uris: [
+                'encrypted<https://alan.eu/login>',
+                'encrypted<https://alan.com>'
+              ].map(encryptedURI =>
+                expect.objectContaining({
+                  uri: {
+                    encryptedString: encryptedURI
+                  }
                 })
-              })
-            ]
+              )
+            })
           })
         )
       })
@@ -247,7 +245,7 @@ describe('WebVaultClient', () => {
             .readFileSync(path.join(__dirname, filename))
             .toString()
           await client.import(fileContent, format)
-          expect(client.createNewCipher).toHaveBeenCalledTimes(nbCiphers)
+          expect(client.createOrUpdateCipher).toHaveBeenCalledTimes(nbCiphers)
           expect(client.apiService.postImportCiphers).toHaveBeenCalledWith(
             expect.objectContaining({
               ciphers: range(nbCiphers).map(() => expect.any(Object))
