@@ -16,8 +16,7 @@ script:
   - set -e
   - yarn setup:submodule
   - yarn lint
-  - yarn build:jslib
-  - yarn build:keys
+  - yarn build
   - yarn test
 deploy:
   provider: script
