@@ -47,7 +47,7 @@
     "babel-plugin-mock-imports": "^1.0.2",
     "babel-plugin-rewire": "1.2.0",
     "babel-preset-cozy-app": "^1.6.0",
-    "cozy-client": "^8.8.0",
+    "cozy-client": "13.12.1",
     "cozy-ui": "^29.9.1",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
