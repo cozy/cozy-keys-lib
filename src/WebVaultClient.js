@@ -18,14 +18,17 @@ import { EnvironmentService } from './@bitwarden/jslib/services/environment.serv
 import { FolderService } from './@bitwarden/jslib/services/folder.service'
 import { I18nService } from './@bitwarden/jslib/services/i18n.service'
 import { ImportService } from './@bitwarden/jslib/services/import.service'
-import { LockService } from './@bitwarden/jslib/services/lock.service'
 import { NoopMessagingService } from './@bitwarden/jslib/services/noopMessaging.service'
 import { PasswordGenerationService } from './@bitwarden/jslib/services/passwordGeneration.service'
+import { PolicyService } from './@bitwarden/jslib/services/policy.service'
 import { SearchService } from './@bitwarden/jslib/services/search.service'
+import { SendService } from './@bitwarden/jslib/services/send.service'
 import { SettingsService } from './@bitwarden/jslib/services/settings.service'
 import { SyncService } from './@bitwarden/jslib/services/sync.service'
 import { TokenService } from './@bitwarden/jslib/services/token.service'
 import { UserService } from './@bitwarden/jslib/services/user.service'
+import { VaultTimeoutService } from './@bitwarden/jslib/services/vaultTimeout.service'
+
 import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoFunction.service'
 
 import { CipherType } from './@bitwarden/jslib/enums/cipherType'
@@ -119,6 +122,15 @@ class WebVaultClient {
       async expired => messagingService.send('logout', { expired: expired })
     )
     const userService = new UserService(tokenService, storageService)
+    const policyService = new PolicyService(userService, storageService)
+    const sendService = new SendService(
+      cryptoService,
+      userService,
+      apiService,
+      storageService,
+      i18nService,
+      cryptoFunctionService
+    )
     const settingsService = new SettingsService(userService, storageService)
     let searchService = null
     const cipherService = new CipherService(
@@ -145,7 +157,7 @@ class WebVaultClient {
       i18nService
     )
     searchService = new SearchService(cipherService, platformUtilsService)
-    const lockService = new LockService(
+    const vaultTimeoutService = new VaultTimeoutService(
       cipherService,
       folderService,
       collectionService,
@@ -167,11 +179,14 @@ class WebVaultClient {
       collectionService,
       storageService,
       messagingService,
+      policyService,
+      sendService,
       async expired => messagingService.send('logout', { expired })
     )
     const passwordGenerationService = new PasswordGenerationService(
       cryptoService,
-      storageService
+      storageService,
+      policyService
     )
     const containerService = new ContainerService(cryptoService)
     const authService = new AuthService(
@@ -207,7 +222,7 @@ class WebVaultClient {
     this.collectionService = collectionService
     this.passwordGenerationService = passwordGenerationService
     this.containerService = containerService
-    this.lockService = lockService
+    this.vaultTimeoutService = vaultTimeoutService
     this.importService = importService
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
@@ -256,7 +271,7 @@ class WebVaultClient {
   async isLocked() {
     this.attachToGlobal()
     const isAuthed = await this.userService.isAuthenticated()
-    const isLocked = this.lockService.isLocked()
+    const isLocked = this.vaultTimeoutService.isLocked()
     return !isAuthed || isLocked
   }
 
@@ -266,7 +281,7 @@ class WebVaultClient {
   async lock() {
     this.attachToGlobal()
     await this.initFinished
-    const lock = await this.lockService.lock()
+    const lock = await this.vaultTimeoutService.lock()
     this.emit('lock', this)
     return lock
   }
@@ -488,6 +503,7 @@ class WebVaultClient {
       }
       this.emit('unlock_no_login', this)
     }
+    this.sync()
     this.emit('unlock', this)
     return true
   }
