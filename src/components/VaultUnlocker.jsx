@@ -57,7 +57,7 @@ const VaultUnlocker = ({
   return locked && shouldUnlock ? (
     <UnlockForm onDismiss={onDismiss} closable={closable} onUnlock={onUnlock} />
   ) : (
-    children
+    children || null
   )
 }
 
