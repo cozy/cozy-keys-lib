@@ -94,7 +94,7 @@ function getLightCryptoService() {
 /**
  * Check if there are ciphers in the database
  * @param {object} cozyClient - cozy-client instance
- * @return {bool} whether there are ciphers in the databse or not
+ * @return {bool} whether there are ciphers in the database or not
  */
 export const checkHasCiphers = async cozyClient => {
   try {
