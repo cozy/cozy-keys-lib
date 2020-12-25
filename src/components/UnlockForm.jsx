@@ -171,7 +171,7 @@ class UnlockForm extends React.Component {
 UnlockForm.propTypes = {
   vaultClient: PropTypes.object.isRequired,
   t: PropTypes.func.isRequired,
-  onDismiss: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func,
   closable: PropTypes.bool,
   client: PropTypes.object.isRequired,
   onUnlock: PropTypes.func
