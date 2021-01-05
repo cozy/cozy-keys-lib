@@ -1,4 +1,4 @@
-/* Made automatically with svgr from icon-cozy-security.svg */
+/* Made automatically with svgr from <rootDir>/assets/icon-cozy-security.svg */
 
 import React from "react"
 
