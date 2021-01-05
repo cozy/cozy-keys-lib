@@ -1,12 +1,13 @@
 /** Components meant to be used in several examples */
 
 import React from 'react'
-import { withClient, queryConnect } from 'cozy-client'
+import { useClient, queryConnect } from 'cozy-client'
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
 
-export const LogoutButton = withClient(({ client }) => {
+export const LogoutButton = () => {
+  const client = useClient()
   return <button onClick={() => client.logout()}>Logout</button>
-})
+}
 
 class _AppList extends React.Component {
   render() {

@@ -1,28 +1,33 @@
 import React, { useState } from 'react'
 import TextField from 'cozy-ui/transpiled/react/MuiCozyTheme/TextField'
-import Button from 'cozy-ui/transpiled/react/Button'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { translate } from 'cozy-ui/transpiled/react/I18n'
-import omit from 'lodash/omit'
+import { useI18n } from 'cozy-ui/transpiled/react/I18n'
+import Icon from 'cozy-ui/transpiled/react/Icon'
+import EyeIcon from 'cozy-ui/transpiled/react/Icons/Eye'
+import EyeClosedIcon from 'cozy-ui/transpiled/react/Icons/EyeClosed'
+import MuiButton from 'cozy-ui/transpiled/react/MuiCozyTheme/Buttons'
 
-const DumbEyeAdornment = props => {
-  const { hidden, t, ...rest } = omit(props, 'f')
+const EyeAdornment = props => {
+  const { hidden, ...rest } = props
+  const { t } = useI18n()
 
   return (
     <InputAdornment position="end">
-      <Button
-        iconOnly
-        icon={hidden ? 'eye' : 'eye-closed'}
+      <MuiButton
         className="u-ph-half u-mh-0 u-miw-auto"
-        type="button"
+        color="secondary"
         label={hidden ? t('unlock.show') : t('unlock.hide')}
         {...rest}
-      />
+      >
+        <Icon icon={hidden ? EyeIcon : EyeClosedIcon} />
+      </MuiButton>
     </InputAdornment>
   )
 }
 
-const EyeAdornment = translate()(DumbEyeAdornment)
+const passwordInputProps = {
+  'data-testid': 'password'
+}
 
 const PasswordField = props => {
   const [hidden, setHidden] = useState(true)
@@ -33,6 +38,7 @@ const PasswordField = props => {
       variant="outlined"
       type={hidden ? 'password' : 'text'}
       InputProps={{
+        inputProps: passwordInputProps,
         endAdornment: (
           <EyeAdornment onClick={() => setHidden(!hidden)} hidden={hidden} />
         )

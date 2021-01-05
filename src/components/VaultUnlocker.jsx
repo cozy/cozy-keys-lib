@@ -5,7 +5,7 @@ import withLocales from 'cozy-ui/transpiled/react/I18n/withLocales'
 import localesEn from '../locales/en.json'
 import localesFr from '../locales/fr.json'
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
-import { withClient } from 'cozy-client'
+import { useClient } from 'cozy-client'
 import { checkHasCiphers, checkHasInstalledExtension } from '../CozyUtils'
 
 const locales = {
@@ -13,13 +13,8 @@ const locales = {
   fr: localesFr
 }
 
-const VaultUnlocker = ({
-  children,
-  onDismiss,
-  closable,
-  onUnlock,
-  client: cozyClient
-}) => {
+const VaultUnlocker = ({ children, onDismiss, closable, onUnlock }) => {
+  const cozyClient = useClient()
   const [isChecking, setIsChecking] = useState(true)
   const [shouldUnlock, setShouldUnlock] = useState(false)
 
@@ -48,7 +43,7 @@ const VaultUnlocker = ({
 
   if (isChecking) {
     return (
-      <div className="u-ta-center">
+      <div className="u-ta-center u-mv-3">
         <Spinner size="xxlarge" />
       </div>
     )
@@ -61,4 +56,4 @@ const VaultUnlocker = ({
   )
 }
 
-export default withLocales(locales)(withClient(VaultUnlocker))
+export default withLocales(locales)(VaultUnlocker)
