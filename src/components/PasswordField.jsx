@@ -25,6 +25,10 @@ const EyeAdornment = props => {
   )
 }
 
+const passwordInputProps = {
+  'data-testid': 'password'
+}
+
 const PasswordField = props => {
   const [hidden, setHidden] = useState(true)
 
@@ -34,6 +38,7 @@ const PasswordField = props => {
       variant="outlined"
       type={hidden ? 'password' : 'text'}
       InputProps={{
+        inputProps: passwordInputProps,
         endAdornment: (
           <EyeAdornment onClick={() => setHidden(!hidden)} hidden={hidden} />
         )
