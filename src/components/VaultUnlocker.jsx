@@ -48,7 +48,7 @@ const VaultUnlocker = ({
 
   if (isChecking) {
     return (
-      <div className="u-ta-center">
+      <div className="u-ta-center u-mv-3">
         <Spinner size="xxlarge" />
       </div>
     )
