@@ -49,7 +49,7 @@ const UnlockForm = props => {
     } finally {
       setUnlocking(false)
     }
-  }, [vaultClient, onUnlock])
+  }, [vaultClient, onUnlock, password])
 
   const handleVaultUnlock = useCallback(
     ev => {
