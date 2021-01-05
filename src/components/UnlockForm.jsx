@@ -9,7 +9,7 @@ import Button from 'cozy-ui/transpiled/react/Button'
 import CozyTheme from 'cozy-ui/transpiled/react/CozyTheme'
 import { IllustrationDialog } from 'cozy-ui/transpiled/react/CozyDialogs'
 
-import CloudIcon from '../../assets/icon-cozy-security.svg'
+import CloudIcon from '../../assets/IconCozySecurity'
 import PasswordField from './PasswordField'
 
 import { useVaultClient } from './VaultContext'
