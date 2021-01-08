@@ -69,13 +69,15 @@ const UnlockForm = props => {
         size="medium"
         open={true}
         onClose={closable && onDismiss}
-        title={t('unlock.title')}
         content={
           <form
             onSubmit={handleVaultUnlock}
             className="u-stack-m u-flex u-flex-column u-flex-items-center"
           >
-            <CloudIcon />
+            <CloudIcon className="u-mb-half" />
+            <Typography variant="h3" gutterBottom>
+              {t('unlock.title')}
+            </Typography>
             {error ? (
               <Typography variant="body1" className="u-error">
                 {t('unlock.error')}
@@ -110,7 +112,7 @@ const UnlockForm = props => {
             label={t('unlock.unlock')}
             theme="primary"
             className={cx({
-              'u-mt-2-half': !isMobile,
+              'u-mt-1': !isMobile,
               'u-mt-auto': isMobile
             })}
             busy={unlocking}

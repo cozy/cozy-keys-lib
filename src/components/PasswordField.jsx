@@ -26,7 +26,8 @@ const EyeAdornment = props => {
 }
 
 const passwordInputProps = {
-  'data-testid': 'password'
+  'data-testid': 'password',
+  autoFocus: true
 }
 
 const PasswordField = props => {
