@@ -1,5 +1,5 @@
 import StrippedWebPlatformUtilsService from './StrippedWebPlatformUtilsService'
-
+import { Q } from 'cozy-client'
 import { CryptoService } from './@bitwarden/jslib/services/crypto.service'
 import { WebCryptoFunctionService } from './@bitwarden/jslib/services/webCryptoFunction.service'
 
@@ -98,9 +98,7 @@ function getLightCryptoService() {
  */
 export const checkHasCiphers = async cozyClient => {
   try {
-    const { data: ciphers } = await cozyClient.query(
-      cozyClient.find(CIPHERS_DOCTYPE)
-    )
+    const { data: ciphers } = await cozyClient.query(Q(CIPHERS_DOCTYPE))
 
     return ciphers.length > 0
   } catch (err) {

@@ -66,7 +66,7 @@ const UnlockForm = props => {
   return (
     <CozyTheme variant="inverted">
       <IllustrationDialog
-        size="medium"
+        size="small"
         open={true}
         onClose={closable && onDismiss}
         content={

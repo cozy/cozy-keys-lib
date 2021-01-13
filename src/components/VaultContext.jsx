@@ -1,8 +1,13 @@
 import React, { useContext } from 'react'
 import PropTypes from 'prop-types'
 import WebVaultClient from '../WebVaultClient'
+import memoize from 'lodash/memoize'
 
 const VaultContext = React.createContext()
+
+const getVaultClient = memoize(
+  (instance, unsafeStorage) => new WebVaultClient(instance, { unsafeStorage })
+)
 
 class VaultProvider extends React.Component {
   constructor(props) {
@@ -23,6 +28,16 @@ class VaultProvider extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    const { client } = this.state
+    if (!client) {
+      return
+    }
+    client.removeListener('unlock', this.updateLockedState)
+    client.removeListener('lock', this.updateLockedState)
+    client.removeListener('login', this.updateLockedState)
+  }
+
   async updateLockedState() {
     const { client } = this.state
     const locked = await client.isLocked()
@@ -33,7 +48,8 @@ class VaultProvider extends React.Component {
 
   setupClient() {
     const unsafeStorage = this.props.unsafeStorage
-    const client = new WebVaultClient(this.props.instance, { unsafeStorage })
+
+    const client = getVaultClient(this.props.instance, unsafeStorage)
 
     this.setState(
       {
