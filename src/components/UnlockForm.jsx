@@ -8,6 +8,7 @@ import { useI18n } from 'cozy-ui/transpiled/react/I18n'
 import Button from 'cozy-ui/transpiled/react/Button'
 import CozyTheme from 'cozy-ui/transpiled/react/CozyTheme'
 import { IllustrationDialog } from 'cozy-ui/transpiled/react/CozyDialogs'
+import { withStyles } from '@material-ui/core/styles'
 
 import CloudIcon from './IconCozySecurity'
 import PasswordField from './PasswordField'
@@ -20,13 +21,43 @@ const getPassphraseResetUrl = client => {
   return url.href
 }
 
+const ExpandedIllustrationDialog = withStyles({
+  paper: {
+    '&.small': {
+      width: '100%',
+      height: '100%',
+      maxWidth: '100%',
+      maxHeight: '100%',
+      margin: 0
+    }
+  },
+  root: {
+    '& .dialogContentInner': {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      height: '80%',
+      width: '100%'
+    }
+  }
+  // eslint-disable-next-line no-unused-vars
+})(IllustrationDialog)
+
+const UnlockDialog = ({ useAllAvailableSpace, ...props }) => {
+  return useAllAvailableSpace ? (
+    <ExpandedIllustrationDialog {...props} />
+  ) : (
+    <IllustrationDialog {...props} />
+  )
+}
+
 const UnlockForm = props => {
   const client = useClient()
   const vaultClient = useVaultClient()
   const { isMobile } = useBreakpoints()
   const { t } = useI18n()
 
-  const { onUnlock, onDismiss, closable } = props
+  const { onUnlock, onDismiss, closable, useAllAvailableSpace } = props
 
   const [unlocking, setUnlocking] = useState(false)
   const [error, setError] = useState(null)
@@ -65,10 +96,11 @@ const UnlockForm = props => {
 
   return (
     <CozyTheme variant="inverted">
-      <IllustrationDialog
+      <UnlockDialog
         size="small"
         open={true}
-        onClose={closable && onDismiss}
+        onClose={closable ? onDismiss : null}
+        useAllAvailableSpace={useAllAvailableSpace}
         content={
           <form
             onSubmit={handleVaultUnlock}

@@ -7,6 +7,7 @@ import localesFr from '../locales/fr.json'
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
 import Overlay from 'cozy-ui/transpiled/react/Overlay'
 import { useClient } from 'cozy-client'
+import PropTypes from 'prop-types'
 import { checkHasCiphers, checkHasInstalledExtension } from '../CozyUtils'
 
 const locales = {
@@ -14,7 +15,13 @@ const locales = {
   fr: localesFr
 }
 
-const VaultUnlocker = ({ children, onDismiss, closable, onUnlock }) => {
+const VaultUnlocker = ({
+  children,
+  onDismiss,
+  closable,
+  onUnlock,
+  useAllAvailableSpace
+}) => {
   const cozyClient = useClient()
   const [showSpinner, setShowSpinner] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
@@ -61,10 +68,23 @@ const VaultUnlocker = ({ children, onDismiss, closable, onUnlock }) => {
   }
 
   return locked && shouldUnlock ? (
-    <UnlockForm onDismiss={onDismiss} closable={closable} onUnlock={onUnlock} />
+    <UnlockForm
+      onDismiss={onDismiss}
+      closable={closable}
+      onUnlock={onUnlock}
+      useAllAvailableSpace={useAllAvailableSpace}
+    />
   ) : (
     children || null
   )
+}
+
+VaultUnlocker.propTypes = {
+  /**
+   * Set to true, if you want the modal to take all the space in its container.
+   * Useful when rendering the UnlockForm in an IntentModal
+   */
+  useAllAvailableSpace: PropTypes.bool
 }
 
 export default withLocales(locales)(VaultUnlocker)
