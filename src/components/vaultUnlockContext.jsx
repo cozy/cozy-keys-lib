@@ -8,6 +8,38 @@ export const useVaultUnlockContext = () => {
   return useContext(vaultUnlockContext)
 }
 
+/**
+ * Provides a way to unlock the vault from the context
+ *
+ * The context stores whether the vault unlocking form is
+ * shown. This is used by the VaultPlaceholder to decide
+ * whether it needs to show the unlock form.
+ *
+ * If the vault has not been setup or if it is already unlocked,
+ * the showUnlockForm function in the context value, will
+ * call the onUnlock function immediately.
+ *
+ * @example
+ * ```
+ * import { VaultUnlockPlaceholder, useVaultUnlockContext } from 'cozy-keys-lib'
+ *
+ * const Component = ({ onUnlock }) => {
+ *   const { showUnlockForm } = useVaultUnlockContext()
+ *   return (
+ *     <div>
+ *       <button onClick={() => showUnlockForm({ onUnlock })} role="button">
+ *         show unlock form
+ *       </button>
+ *     </div>
+ *   )
+ * }
+ *
+ * <VaultProvider instance='http://cozy.tools:8080'>
+ *   <Component onUnlock={() => alert('vault has been unlocked')} />
+ *   <VaultUnlockPlaceholder />
+ * </VaultProvider>
+ * ```
+ */
 export const VaultUnlockProvider = ({ children }) => {
   const client = useClient()
   const vaultClient = useVaultClient()
