@@ -1,9 +1,11 @@
 import React, { useMemo, useState, useContext } from 'react'
 import { useClient } from 'cozy-client'
+
 import { useVaultClient } from './VaultContext'
-import * as CozyUtils from '../CozyUtils'
+import { checkShouldUnlock } from './defaults'
 
 const vaultUnlockContext = React.createContext()
+
 export const useVaultUnlockContext = () => {
   return useContext(vaultUnlockContext)
 }
@@ -40,7 +42,7 @@ export const useVaultUnlockContext = () => {
  * </VaultProvider>
  * ```
  */
-export const VaultUnlockProvider = ({ children }) => {
+export const VaultUnlockProvider = ({ children, checkShouldUnlock }) => {
   const client = useClient()
   const vaultClient = useVaultClient()
   const [showingUnlockForm, setShowingUnlockForm] = useState(false)
@@ -62,9 +64,8 @@ export const VaultUnlockProvider = ({ children }) => {
         unlockFormProps.onDismiss && unlockFormProps.onDismiss()
       }
 
-      const shouldUnlock =
-        (await CozyUtils.checkHasInstalledExtension(client)) &&
-        (await vaultClient.isLocked())
+      const shouldUnlock = await checkShouldUnlock(vaultClient, client)
+
       if (shouldUnlock) {
         setUnlockFormProps({
           ...unlockFormProps,
@@ -83,13 +84,23 @@ export const VaultUnlockProvider = ({ children }) => {
       unlockFormProps,
       vaultClient
     }
-  }, [showingUnlockForm, unlockFormProps, vaultClient, client])
+  }, [
+    showingUnlockForm,
+    unlockFormProps,
+    vaultClient,
+    checkShouldUnlock,
+    client
+  ])
 
   return (
     <vaultUnlockContext.Provider value={value}>
       {children}
     </vaultUnlockContext.Provider>
   )
+}
+
+VaultUnlockProvider.defaultProps = {
+  checkShouldUnlock: checkShouldUnlock
 }
 
 export const withVaultUnlockContext = Component => {

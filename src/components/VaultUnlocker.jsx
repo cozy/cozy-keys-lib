@@ -1,27 +1,37 @@
-import React, { useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { VaultContext } from './VaultContext'
-import UnlockForm from './UnlockForm'
-import withLocales from 'cozy-ui/transpiled/react/I18n/withLocales'
-import localesEn from '../locales/en.json'
-import localesFr from '../locales/fr.json'
+
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
 import Overlay from 'cozy-ui/transpiled/react/Overlay'
+import withLocales from 'cozy-ui/transpiled/react/I18n/withLocales'
 import { useClient } from 'cozy-client'
-import { checkHasCiphers, checkHasInstalledExtension } from '../CozyUtils'
+
+import localesEn from '../locales/en.json'
+import localesFr from '../locales/fr.json'
+
+import { VaultContext } from './VaultContext'
+import UnlockForm from './UnlockForm'
+import { checkShouldUnlock } from './defaults'
 
 const locales = {
   en: localesEn,
   fr: localesFr
 }
 
-const VaultUnlocker = ({ children, onDismiss, closable, onUnlock }) => {
+const VaultUnlocker = ({
+  children,
+  onDismiss,
+  closable,
+  onUnlock,
+  UnlockForm,
+  checkShouldUnlock
+}) => {
   const cozyClient = useClient()
+  const { locked, client: vaultClient } = useContext(VaultContext)
+
   const [showSpinner, setShowSpinner] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
   const [shouldUnlock, setShouldUnlock] = useState(false)
-
-  const { locked } = React.useContext(VaultContext)
 
   useEffect(() => {
     let interval = setInterval(() => {
@@ -31,24 +41,18 @@ const VaultUnlocker = ({ children, onDismiss, closable, onUnlock }) => {
   }) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const checkShouldUnlock = async () => {
-      let shouldUnlock = await checkHasCiphers(cozyClient)
-
-      if (!shouldUnlock) {
-        shouldUnlock = await checkHasInstalledExtension(cozyClient)
-      }
+    const doCheckShouldUnlock = async () => {
+      const shouldUnlock = await checkShouldUnlock(vaultClient, cozyClient)
 
       setShouldUnlock(shouldUnlock)
       setIsChecking(false)
 
-      // If there is no cipher in the vault, it means the user never used it,
-      // so we don't force them to unlock it for nothing
       if (!shouldUnlock && onUnlock) {
         onUnlock()
       }
     }
 
-    checkShouldUnlock()
+    doCheckShouldUnlock()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (isChecking) {
@@ -72,6 +76,11 @@ VaultUnlocker.propTypes = {
   onDismiss: PropTypes.func.isRequired,
   closable: PropTypes.bool,
   onUnlock: PropTypes.func.isRequired
+}
+
+VaultUnlocker.defaultProps = {
+  UnlockForm,
+  checkShouldUnlock: checkShouldUnlock
 }
 
 export default withLocales(locales)(VaultUnlocker)
