@@ -12,3 +12,9 @@ export {
 } from './components/VaultContext'
 
 export VaultUnlocker from './components/VaultUnlocker'
+export VaultUnlockPlaceholder from './components/VaultUnlockPlaceholder'
+export {
+  useVaultUnlockContext,
+  VaultUnlockProvider,
+  withVaultUnlockContext
+} from './components/vaultUnlockContext'
