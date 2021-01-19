@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { VaultContext } from './VaultContext'
 import UnlockForm from './UnlockForm'
 import withLocales from 'cozy-ui/transpiled/react/I18n/withLocales'
@@ -65,6 +66,12 @@ const VaultUnlocker = ({ children, onDismiss, closable, onUnlock }) => {
   ) : (
     children || null
   )
+}
+
+VaultUnlocker.propTypes = {
+  onDismiss: PropTypes.func.isRequired,
+  closable: PropTypes.bool,
+  onUnlock: PropTypes.func.isRequired
 }
 
 export default withLocales(locales)(VaultUnlocker)
