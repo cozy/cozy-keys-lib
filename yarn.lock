@@ -3370,16 +3370,16 @@ cosmiconfig@^5.0.1:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-cozy-client@^16.10.2:
-  version "16.10.2"
-  resolved "https://registry.yarnpkg.com/cozy-client/-/cozy-client-16.10.2.tgz#c13e0911fa88f12be0688ec70acacd23291b2bb5"
-  integrity sha512-yCB8NRtHYnI/n+FTbdnSBYH8KkN6U2kC6khKY+VHUUcW6yk3rzRPM1ibNI+DJTHVm1hxNSjTtOofxAZJ9MteQg==
+cozy-client@17.6.0:
+  version "17.6.0"
+  resolved "https://registry.yarnpkg.com/cozy-client/-/cozy-client-17.6.0.tgz#35bc8ea4bac214088314d9a64487f85f6dbe6f69"
+  integrity sha512-NsxSJVUNAiOlH8n6UHw8eIC6n9UtiKpYvWqli5o4UhFTVnvWH66nrg+1ajF5Bo92EF6NeuLjLPciZPP4GtXuNQ==
   dependencies:
     "@cozy/minilog" "1.0.0"
     btoa "^1.2.1"
     cozy-device-helper "^1.7.3"
     cozy-logger "^1.6.0"
-    cozy-stack-client "^16.8.0"
+    cozy-stack-client "^17.6.0"
     lodash "^4.17.13"
     microee "^0.0.6"
     node-fetch "^2.6.1"
@@ -3406,6 +3406,13 @@ cozy-device-helper@^1.7.5:
   dependencies:
     lodash "4.17.15"
 
+cozy-flags@^2.5.0:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/cozy-flags/-/cozy-flags-2.5.3.tgz#5f9748bc6b9d4b378b5cef1b801716f26c0f2cf3"
+  integrity sha512-ZZ2dSUbR+pUOh/vjTk0iJxJ7EKwBDxkSVDFgrQmSuyEw8q3QflqG/SxwElAlwz5IXz/h5hM4eix9ya18MsPMoQ==
+  dependencies:
+    microee "^0.0.6"
+
 cozy-interapp@0.5.4:
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/cozy-interapp/-/cozy-interapp-0.5.4.tgz#2573f1800f073c84c289267d04234954d88eae0c"
@@ -3419,11 +3426,12 @@ cozy-logger@^1.6.0:
     chalk "^2.4.2"
     json-stringify-safe "5.0.1"
 
-cozy-stack-client@^16.8.0:
-  version "16.8.0"
-  resolved "https://registry.yarnpkg.com/cozy-stack-client/-/cozy-stack-client-16.8.0.tgz#091d76ce6368594ab345ab6bb942a105a62c2dd5"
-  integrity sha512-7B2j9OMGMv6hnwQ+L6i6gXBOEQJ1QOcoi+x9N4PFhDM0Wy76UaGUwsciKhUiJ3dr34IxhEa/VywK023nybG0rA==
+cozy-stack-client@^17.6.0:
+  version "17.6.0"
+  resolved "https://registry.yarnpkg.com/cozy-stack-client/-/cozy-stack-client-17.6.0.tgz#adc3a49ae9bcfe7624e073325ae66d4554938111"
+  integrity sha512-lPR0Oh963VtSFpehYLOGFNG1Mta/KynYmzN+9xkOdm409g062iko02OTf7I67nnkIT2Zr1gSEsm91jlh4GeRTQ==
   dependencies:
+    cozy-flags "^2.5.0"
     detect-node "^2.0.4"
     mime "^2.4.0"
     qs "^6.7.0"
