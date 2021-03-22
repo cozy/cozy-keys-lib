@@ -50,6 +50,7 @@
     "babel-plugin-rewire": "1.2.0",
     "babel-preset-cozy-app": "^1.6.0",
     "cozy-client": "^16.10.2",
+    "cozy-flags": "2.6.0",
     "cozy-ui": "^42.3.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
@@ -85,6 +86,7 @@
   "peerDependencies": {
     "cozy-client": "^16.10.2",
     "cozy-ui": "^42.3.0",
+    "cozy-flags": "^2.6.0",
     "react": "^16.8.3",
     "react-dom": "^16.9.0"
   }
