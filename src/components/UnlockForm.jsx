@@ -1,13 +1,18 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import cx from 'classnames'
+import get from 'lodash/get'
 import PropTypes from 'prop-types'
-import Typography from 'cozy-ui/transpiled/react/Typography'
+
 import { useClient } from 'cozy-client'
+import flag from 'cozy-flags'
+import Typography from 'cozy-ui/transpiled/react/Typography'
 import useBreakpoints from 'cozy-ui/transpiled/react/hooks/useBreakpoints'
 import { useI18n } from 'cozy-ui/transpiled/react/I18n'
 import Button from 'cozy-ui/transpiled/react/Button'
+import Icon from 'cozy-ui/transpiled/react/Icon'
 import CozyTheme from 'cozy-ui/transpiled/react/CozyTheme'
 import { IllustrationDialog } from 'cozy-ui/transpiled/react/CozyDialogs'
+import KeychainIcon from 'cozy-ui/transpiled/react/Icons/Keychain'
 
 import CloudIcon from './IconCozySecurity'
 import PasswordField from './PasswordField'
@@ -18,6 +23,13 @@ const getPassphraseResetUrl = client => {
   const url = new URL('/auth/passphrase_reset', client.getStackClient().uri)
 
   return url.href
+}
+
+const canClientAuthWithOIDC = client => {
+  return (
+    get(client, 'capabilities.can_auth_with_oidc') ||
+    flag('vault.force-oidc-display')
+  )
 }
 
 const UnlockForm = props => {
@@ -63,6 +75,8 @@ const UnlockForm = props => {
     client
   ])
 
+  const canAuthWithOIDC = canClientAuthWithOIDC(client)
+
   return (
     <CozyTheme variant="inverted">
       <IllustrationDialog
@@ -74,9 +88,13 @@ const UnlockForm = props => {
             onSubmit={handleVaultUnlock}
             className="u-stack-m u-flex u-flex-column u-flex-items-center"
           >
-            <CloudIcon className="u-mb-half" />
+            {canAuthWithOIDC ? (
+              <Icon icon={KeychainIcon} size={64} className="u-mb-half" />
+            ) : (
+              <CloudIcon className="u-mb-half" />
+            )}
             <Typography variant="h3" gutterBottom>
-              {t('unlock.title')}
+              {canAuthWithOIDC ? t('unlock.title-oidc') : t('unlock.title')}
             </Typography>
             {error ? (
               <Typography variant="body1" className="u-error">
@@ -88,7 +106,9 @@ const UnlockForm = props => {
 
             <PasswordField
               id="idField"
-              label={t('unlock.label')}
+              label={
+                canAuthWithOIDC ? t('unlock.label-oidc') : t('unlock.label')
+              }
               value={password}
               onChange={handlePasswordChange}
               fullWidth

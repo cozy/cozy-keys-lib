@@ -1,9 +1,11 @@
 {
   "unlock": {
     "title": "Authentification",
+    "title-oidc": "Cozy Pass",
     "subtitle": "Par sécurité, merci de confirmer votre identité",
     "error": "Mot de passe incorrect, essayer à nouveau",
     "label": "Mot de passe Cozy",
+    "label-oidc": "Mot de passe Cozy Pass",
     "show": "afficher",
     "hide": "masquer",
     "abort": "Quitter",
