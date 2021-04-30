@@ -51,7 +51,7 @@
     "babel-preset-cozy-app": "^1.6.0",
     "cozy-client": "^16.10.2",
     "cozy-flags": "2.6.0",
-    "cozy-ui": "^42.3.0",
+    "cozy-ui": "49.5.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "enzyme-to-json": "3.4.0",
