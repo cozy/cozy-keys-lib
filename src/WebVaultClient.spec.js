@@ -37,6 +37,47 @@ describe('WebVaultClient', () => {
         client1.containerService
       )
     })
+
+    it('should allow optional dependency injection', () => {
+      const vaultData = {
+        apiService: {},
+        environmentService: {
+          setUrls: () => Promise.resolve()
+        },
+        authService: {},
+        syncService: {},
+        cryptoService: {},
+        cipherService: {},
+        userService: {},
+        collectionService: {},
+        passwordGenerationService: {},
+        containerService: {},
+        vaultTimeoutService: {},
+        importService: {},
+        utils: {}
+      }
+
+      const client = new WebVaultClient('https://me.cozy.wtf', {}, vaultData)
+
+      expect(Utils.global.bitwardenContainerService).toBe(
+        vaultData.containerService
+      )
+      expect(client.apiService).toBe(vaultData.apiService)
+      expect(client.environmentService).toBe(vaultData.environmentService)
+      expect(client.authService).toBe(vaultData.authService)
+      expect(client.syncService).toBe(vaultData.syncService)
+      expect(client.cryptoService).toBe(vaultData.cryptoService)
+      expect(client.cipherService).toBe(vaultData.cipherService)
+      expect(client.userService).toBe(vaultData.userService)
+      expect(client.collectionService).toBe(vaultData.collectionService)
+      expect(client.passwordGenerationService).toBe(
+        vaultData.passwordGenerationService
+      )
+      expect(client.containerService).toBe(vaultData.containerService)
+      expect(client.vaultTimeoutService).toBe(vaultData.vaultTimeoutService)
+      expect(client.importService).toBe(vaultData.importService)
+      expect(client.Utils).toBe(vaultData.utils)
+    })
   })
 
   describe('weakMatch', () => {
