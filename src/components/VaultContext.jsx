@@ -6,7 +6,8 @@ import memoize from 'lodash/memoize'
 const VaultContext = React.createContext()
 
 const getVaultClient = memoize(
-  (instance, unsafeStorage) => new WebVaultClient(instance, { unsafeStorage })
+  (instance, unsafeStorage, vaultData) =>
+    new WebVaultClient(instance, { unsafeStorage }, vaultData)
 )
 
 class VaultProvider extends React.Component {
@@ -49,7 +50,11 @@ class VaultProvider extends React.Component {
   setupClient() {
     const unsafeStorage = this.props.unsafeStorage
 
-    const client = getVaultClient(this.props.instance, unsafeStorage)
+    const client = getVaultClient(
+      this.props.instance,
+      unsafeStorage,
+      this.props.vaultData
+    )
 
     this.setState(
       {

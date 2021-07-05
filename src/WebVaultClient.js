@@ -65,6 +65,24 @@ const isSupportedCipher = cipher => cipher.login
  * const all = vault.getAllDecrypted({type: CipherType.Login})
  * ```
  */
+
+/**
+ * @typedef {object} VaultData
+ * @property {ApiService} apiService
+ * @property {EnvironmentService} environmentService
+ * @property {AuthService} authService
+ * @property {SyncService} syncService
+ * @property {CryptoService} cryptoService
+ * @property {CipherService} cipherService
+ * @property {UserService} userService
+ * @property {CollectionService} collectionService
+ * @property {PasswordGenerationService} passwordGenerationService
+ * @property {ContainerService} containerService
+ * @property {VaultTimeoutService} vaultTimeoutService
+ * @property {ImportService} importService
+ * @property {Utils} utils
+ */
+
 class WebVaultClient {
   /**
    * @constructor
@@ -76,8 +94,13 @@ class WebVaultClient {
    * @param {string} options.urls.identity - URL of the identity server
    * @param {string} options.urls.api - URL of the api server
    * @param {string} options.urls.events - URL of the events server
+   * @param {VaultData} vaultData - optional Vault related services that may be injected
    */
-  constructor(instance_or_email, { urls, locale, unsafeStorage } = {}) {
+  constructor(
+    instance_or_email,
+    { urls, locale, unsafeStorage } = {},
+    vaultData = undefined
+  ) {
     this.instance = instance_or_email
     this.email = CozyUtils.getEmail(instance_or_email)
 
@@ -90,14 +113,10 @@ class WebVaultClient {
     }
 
     this.locale = locale || 'en'
-    this.init({ unsafeStorage })
+    this.init({ unsafeStorage }, vaultData)
   }
 
-  /*
-   * @private
-   * Initialize the undelying libraries
-   */
-  init({ unsafeStorage }) {
+  createServices(unsafeStorage) {
     const messagingService = new NoopMessagingService()
     const i18nService = new I18nService(this.locale, './locales')
     const platformUtilsService = this.initPlatformUtilsService(
@@ -212,22 +231,48 @@ class WebVaultClient {
       i18nService,
       collectionService
     )
-    this.apiService = apiService
-    this.environmentService = environmentService
-    this.authService = authService
-    this.syncService = syncService
-    this.cryptoService = cryptoService
-    this.cipherService = cipherService
-    this.userService = userService
-    this.collectionService = collectionService
-    this.passwordGenerationService = passwordGenerationService
-    this.containerService = containerService
-    this.vaultTimeoutService = vaultTimeoutService
-    this.importService = importService
+
+    return {
+      apiService: apiService,
+      environmentService: environmentService,
+      authService: authService,
+      syncService: syncService,
+      cryptoService: cryptoService,
+      cipherService: cipherService,
+      userService: userService,
+      collectionService: collectionService,
+      passwordGenerationService: passwordGenerationService,
+      containerService: containerService,
+      vaultTimeoutService: vaultTimeoutService,
+      importService: importService,
+      utils: Utils
+    }
+  }
+
+  /*
+   * @private
+   * Initialize the undelying libraries
+   */
+  init({ unsafeStorage }, vaultData) {
+    vaultData = vaultData || this.createServices(unsafeStorage)
+
+    this.apiService = vaultData.apiService
+    this.environmentService = vaultData.environmentService
+    this.authService = vaultData.authService
+    this.syncService = vaultData.syncService
+    this.cryptoService = vaultData.cryptoService
+    this.cipherService = vaultData.cipherService
+    this.userService = vaultData.userService
+    this.collectionService = vaultData.collectionService
+    this.passwordGenerationService = vaultData.passwordGenerationService
+    this.containerService = vaultData.containerService
+    this.vaultTimeoutService = vaultData.vaultTimeoutService
+    this.importService = vaultData.importService
+    this.Utils = vaultData.utils
+
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
     this.initFinished.then(() => this.emit('init', this))
-    this.Utils = Utils
   }
 
   initPlatformUtilsService(i18nService, messagingService) {
