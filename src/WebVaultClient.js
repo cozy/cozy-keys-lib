@@ -116,154 +116,160 @@ class WebVaultClient {
     this.init({ unsafeStorage }, vaultData)
   }
 
+  createServices(unsafeStorage) {
+    const messagingService = new NoopMessagingService()
+    const i18nService = new I18nService(this.locale, './locales')
+    const platformUtilsService = this.initPlatformUtilsService(
+      i18nService,
+      messagingService
+    )
+    const cryptoFunctionService = this.initCryptoFunctionService(
+      platformUtilsService
+    )
+    const storageService = this.initStorageService(platformUtilsService)
+    const secureStorageService = this.initSecureStorageService()
+    const cryptoService = new CryptoService(
+      storageService,
+      unsafeStorage ? storageService : secureStorageService,
+      cryptoFunctionService
+    )
+    const tokenService = new TokenService(storageService)
+    const appIdService = new AppIdService(storageService)
+    const apiService = new ApiService(
+      tokenService,
+      platformUtilsService,
+      async expired => messagingService.send('logout', { expired: expired })
+    )
+    const userService = new UserService(tokenService, storageService)
+    const policyService = new PolicyService(userService, storageService)
+    const sendService = new SendService(
+      cryptoService,
+      userService,
+      apiService,
+      storageService,
+      i18nService,
+      cryptoFunctionService
+    )
+    const settingsService = new SettingsService(userService, storageService)
+    let searchService = null
+    const cipherService = new CipherService(
+      cryptoService,
+      userService,
+      settingsService,
+      apiService,
+      storageService,
+      i18nService,
+      () => searchService
+    )
+    const folderService = new FolderService(
+      cryptoService,
+      userService,
+      apiService,
+      storageService,
+      i18nService,
+      cipherService
+    )
+    const collectionService = new CollectionService(
+      cryptoService,
+      userService,
+      storageService,
+      i18nService
+    )
+    searchService = new SearchService(cipherService, platformUtilsService)
+    const vaultTimeoutService = new VaultTimeoutService(
+      cipherService,
+      folderService,
+      collectionService,
+      cryptoService,
+      platformUtilsService,
+      storageService,
+      messagingService,
+      searchService,
+      userService,
+      null
+    )
+    const syncService = new SyncService(
+      userService,
+      apiService,
+      settingsService,
+      folderService,
+      cipherService,
+      cryptoService,
+      collectionService,
+      storageService,
+      messagingService,
+      policyService,
+      sendService,
+      async expired => messagingService.send('logout', { expired })
+    )
+    const passwordGenerationService = new PasswordGenerationService(
+      cryptoService,
+      storageService,
+      policyService
+    )
+    const containerService = new ContainerService(cryptoService)
+    const authService = new AuthService(
+      cryptoService,
+      apiService,
+      userService,
+      tokenService,
+      appIdService,
+      i18nService,
+      platformUtilsService,
+      messagingService
+    )
+    const notificationsService = null
+    const environmentService = new EnvironmentService(
+      apiService,
+      storageService,
+      notificationsService
+    )
+    const importService = new ImportService(
+      cipherService,
+      folderService,
+      apiService,
+      i18nService,
+      collectionService
+    )
+
+    return {
+      apiService: apiService,
+      environmentService: environmentService,
+      authService: authService,
+      syncService: syncService,
+      cryptoService: cryptoService,
+      cipherService: cipherService,
+      userService: userService,
+      collectionService: collectionService,
+      passwordGenerationService: passwordGenerationService,
+      containerService: containerService,
+      vaultTimeoutService: vaultTimeoutService,
+      importService: importService,
+      utils: Utils
+    }
+  }
+
   /*
    * @private
    * Initialize the undelying libraries
    */
   init({ unsafeStorage }, vaultData) {
-    if (vaultData !== undefined) {
-      this.apiService = vaultData.apiService
-      this.environmentService = vaultData.environmentService
-      this.authService = vaultData.authService
-      this.syncService = vaultData.syncService
-      this.cryptoService = vaultData.cryptoService
-      this.cipherService = vaultData.cipherService
-      this.userService = vaultData.userService
-      this.collectionService = vaultData.collectionService
-      this.passwordGenerationService = vaultData.passwordGenerationService
-      this.containerService = vaultData.containerService
-      this.vaultTimeoutService = vaultData.vaultTimeoutService
-      this.importService = vaultData.importService
-      this.Utils = vaultData.utils
-    } else {
-      const messagingService = new NoopMessagingService()
-      const i18nService = new I18nService(this.locale, './locales')
-      const platformUtilsService = this.initPlatformUtilsService(
-        i18nService,
-        messagingService
-      )
-      const cryptoFunctionService = this.initCryptoFunctionService(
-        platformUtilsService
-      )
-      const storageService = this.initStorageService(platformUtilsService)
-      const secureStorageService = this.initSecureStorageService()
-      const cryptoService = new CryptoService(
-        storageService,
-        unsafeStorage ? storageService : secureStorageService,
-        cryptoFunctionService
-      )
-      const tokenService = new TokenService(storageService)
-      const appIdService = new AppIdService(storageService)
-      const apiService = new ApiService(
-        tokenService,
-        platformUtilsService,
-        async expired => messagingService.send('logout', { expired: expired })
-      )
-      const userService = new UserService(tokenService, storageService)
-      const policyService = new PolicyService(userService, storageService)
-      const sendService = new SendService(
-        cryptoService,
-        userService,
-        apiService,
-        storageService,
-        i18nService,
-        cryptoFunctionService
-      )
-      const settingsService = new SettingsService(userService, storageService)
-      let searchService = null
-      const cipherService = new CipherService(
-        cryptoService,
-        userService,
-        settingsService,
-        apiService,
-        storageService,
-        i18nService,
-        () => searchService
-      )
-      const folderService = new FolderService(
-        cryptoService,
-        userService,
-        apiService,
-        storageService,
-        i18nService,
-        cipherService
-      )
-      const collectionService = new CollectionService(
-        cryptoService,
-        userService,
-        storageService,
-        i18nService
-      )
-      searchService = new SearchService(cipherService, platformUtilsService)
-      const vaultTimeoutService = new VaultTimeoutService(
-        cipherService,
-        folderService,
-        collectionService,
-        cryptoService,
-        platformUtilsService,
-        storageService,
-        messagingService,
-        searchService,
-        userService,
-        null
-      )
-      const syncService = new SyncService(
-        userService,
-        apiService,
-        settingsService,
-        folderService,
-        cipherService,
-        cryptoService,
-        collectionService,
-        storageService,
-        messagingService,
-        policyService,
-        sendService,
-        async expired => messagingService.send('logout', { expired })
-      )
-      const passwordGenerationService = new PasswordGenerationService(
-        cryptoService,
-        storageService,
-        policyService
-      )
-      const containerService = new ContainerService(cryptoService)
-      const authService = new AuthService(
-        cryptoService,
-        apiService,
-        userService,
-        tokenService,
-        appIdService,
-        i18nService,
-        platformUtilsService,
-        messagingService
-      )
-      const notificationsService = null
-      const environmentService = new EnvironmentService(
-        apiService,
-        storageService,
-        notificationsService
-      )
-      const importService = new ImportService(
-        cipherService,
-        folderService,
-        apiService,
-        i18nService,
-        collectionService
-      )
-      this.apiService = apiService
-      this.environmentService = environmentService
-      this.authService = authService
-      this.syncService = syncService
-      this.cryptoService = cryptoService
-      this.cipherService = cipherService
-      this.userService = userService
-      this.collectionService = collectionService
-      this.passwordGenerationService = passwordGenerationService
-      this.containerService = containerService
-      this.vaultTimeoutService = vaultTimeoutService
-      this.importService = importService
-      this.Utils = Utils
-    }
+    vaultData = vaultData || this.createServices(unsafeStorage)
+
+    this.apiService = vaultData.apiService
+    this.environmentService = vaultData.environmentService
+    this.authService = vaultData.authService
+    this.syncService = vaultData.syncService
+    this.cryptoService = vaultData.cryptoService
+    this.cipherService = vaultData.cipherService
+    this.userService = vaultData.userService
+    this.collectionService = vaultData.collectionService
+    this.passwordGenerationService = vaultData.passwordGenerationService
+    this.containerService = vaultData.containerService
+    this.vaultTimeoutService = vaultData.vaultTimeoutService
+    this.importService = vaultData.importService
+    this.Utils = vaultData.utils
+
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
     this.initFinished.then(() => this.emit('init', this))
