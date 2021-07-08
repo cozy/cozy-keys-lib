@@ -1711,16 +1711,16 @@ cosmiconfig@^5.0.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-cozy-authentication@^1.17.0:
-  version "1.17.2"
-  resolved "https://registry.yarnpkg.com/cozy-authentication/-/cozy-authentication-1.17.2.tgz#4decb93846490fab58d29f273a36b9301d1a3543"
-  integrity sha512-1M4Nk3lPoRUP0xfcIp25Nq7CBdzimtNYNQxWOFeYlqeoHWk7a7G5sGbxwTQ0Vsm7O2RqXeaRYEYlUyTtmdumMA==
+cozy-authentication@^2.0.0:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/cozy-authentication/-/cozy-authentication-2.0.3.tgz#c43fba0e5fec24152591bedbf6398f680f81dca8"
+  integrity sha512-3SUMZLkp8ulHC4vDu6QaI9m02JgGLDuPXwk0UNePbyU/PXzuczlXwMnBOgUIlmzxAiZs/RVkF09fq0ZFZL95rA==
   dependencies:
-    cozy-device-helper "^1.7.5"
+    cozy-device-helper "^1.8.0"
     localforage "1.7.3"
     prop-types "15.7.2"
-    react-markdown "4.0.8"
-    url-polyfill "1.1.0"
+    snarkdown "1.2.2"
+    url-polyfill "1.1.7"
 
 cozy-client@6.64.7:
   version "6.64.7"
@@ -1738,7 +1738,7 @@ cozy-client@6.64.7:
     sift "^6.0.0"
     url-search-params-polyfill "^7.0.0"
 
-cozy-device-helper@^1.7.3:
+cozy-device-helper@^1.7.3, cozy-device-helper@^1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/cozy-device-helper/-/cozy-device-helper-1.8.0.tgz#17b41d0ea28a504b906669a43449952e72615abb"
   integrity sha512-XomsjdCCWcS01x1QK/Wc4EI4zTxJN8Ouh7956wm2AEQyjj4lN+7cj8tqEBlb8fLWm68/3S3Z4V3iSJDgnJHu6A==
@@ -4956,7 +4956,7 @@ react-lifecycles-compat@^3.0.0, react-lifecycles-compat@^3.0.2, react-lifecycles
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-markdown@4.0.8, react-markdown@^4.0.8:
+react-markdown@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/react-markdown/-/react-markdown-4.0.8.tgz#e3621b5becaac82a651008d7bc8390d3e4e438c0"
   integrity sha512-Z6oa648rufvzyO0KwYJ/9p9AsdYGIluqK6OlpJ35ouJ8HPF0Ko1WDNdyymjDSHxNrkb7HDyEcIDJCQs8NlET5A==
@@ -5539,6 +5539,11 @@ snapdragon@^0.8.1:
     source-map "^0.5.6"
     source-map-resolve "^0.5.0"
     use "^3.1.0"
+
+snarkdown@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/snarkdown/-/snarkdown-1.2.2.tgz#0cfe2f3012b804de120fc0c9f7791e869c59cc74"
+  integrity sha1-DP4vMBK4BN4SD8DJ93kehpxZzHQ=
 
 source-map-resolve@^0.5.0:
   version "0.5.2"
@@ -6130,10 +6135,10 @@ urix@^0.1.0:
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
   integrity sha1-2pN/emLiH+wf0Y1Js1wpNQZ6bHI=
 
-url-polyfill@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/url-polyfill/-/url-polyfill-1.1.0.tgz#d34e1a596d954b864bc8608f84c592820df422db"
-  integrity sha512-QAbzqCwd84yA6VyjV30aZXla+lrRmczDurvlsVnK+tFOu677ZNGz8shcFWQRp5BF9/z7qvNiCQLqpWPtVoUEBg==
+url-polyfill@1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/url-polyfill/-/url-polyfill-1.1.7.tgz#402ee84360eb549bbeb585f4c7971e79a31de9e3"
+  integrity sha512-ZrAxYWCREjmMtL8gSbSiKKLZZticgihCvVBtrFbUVpyoETt8GQJeG2okMWA8XryDAaHMjJfhnc+rnhXRbI4DXA==
 
 url-search-params-polyfill@^7.0.0:
   version "7.0.0"
