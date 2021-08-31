@@ -11,6 +11,7 @@ import { ApiService } from './@bitwarden/jslib/services/api.service'
 import { AppIdService } from './@bitwarden/jslib/services/appId.service'
 import { AuthService } from './@bitwarden/jslib/services/auth.service'
 import { CipherService } from './@bitwarden/jslib/services/cipher.service'
+
 import { CollectionService } from './@bitwarden/jslib/services/collection.service'
 import { ContainerService } from './@bitwarden/jslib/services/container.service'
 import { CryptoService } from './@bitwarden/jslib/services/crypto.service'
@@ -36,6 +37,9 @@ import { KdfType } from './@bitwarden/jslib/enums/kdfType'
 
 import { ImportCiphersRequest } from './@bitwarden/jslib/models/request/importCiphersRequest'
 import { CipherRequest } from './@bitwarden/jslib/models/request/cipherRequest'
+import { CipherString } from './@bitwarden/jslib/models/domain/cipherString'
+import { SymmetricCryptoKey } from './@bitwarden/jslib/models/domain/symmetricCryptoKey'
+
 import { KdfRequest } from './@bitwarden/jslib/models/request/kdfRequest'
 
 import WebPlatformUtilsService from './WebPlatformUtilsService'
@@ -502,6 +506,23 @@ class WebVaultClient {
   }
 
   /**
+   * @typedef EncryptionKey
+   * @property {SymmetricCryptoKey} key - The encryption key
+   * @property {CipherString} encryptedKey - The encrypted key
+   *
+   * Generate a new encryption key
+   * @return {EncryptionKey} the generated key and its encrypted version
+   */
+  async generateEncryptionKey() {
+    const encKey = await this.getEncryptionKey()
+    if (!encKey) {
+      throw new Error('NO_ENCRYPTION_KEY')
+    }
+    const [key, encryptedKey] = await this.cryptoService.makeEncKey(encKey)
+    return { key, encryptedKey }
+  }
+
+  /**
    * Manually encrypt the encryption key
    * Usefull for a password change, with a new master key
    * @param {SymmetricCryptoKey} encryptionKey
@@ -580,16 +601,6 @@ class WebVaultClient {
    */
   async getAllLogins() {
     return this.getAll({ type: CipherType.Login })
-  }
-
-  /**
-   * Decrypt a cipher
-   * @param {Cipher} cipher
-   * @return {CipherView} decrypted cipher
-   */
-  async decrypt(cipher) {
-    this.attachToGlobal()
-    return cipher.decrypt()
   }
 
   /**
@@ -732,6 +743,60 @@ class WebVaultClient {
   async encrypt(cipherView) {
     this.attachToGlobal()
     return this.cipherService.encrypt(cipherView)
+  }
+
+  /**
+   * Decrypt a cipher
+   * @param {Cipher} cipher
+   * @return {CipherView} decrypted cipher
+   */
+  async decrypt(cipher) {
+    this.attachToGlobal()
+    return cipher.decrypt()
+  }
+
+  /**
+   * Decrypt an encryption key, encrypted with the vault encryption key
+   * @param {string} encryptedKey - The string-encoded encrypted key
+   * @return {SymmetricCryptoKey} The encryption key
+   */
+  async decryptEncryptionKey(encryptedKey) {
+    const encKey = await this.getEncryptionKey()
+    if (!encKey) {
+      throw new Error('NO_ENCRYPTION_KEY')
+    }
+    const cipher = new CipherString(encryptedKey)
+    const decryptedBuffer = await this.cryptoService.decryptToBytes(
+      cipher,
+      encKey
+    )
+    return new SymmetricCryptoKey(decryptedBuffer)
+  }
+
+  /**
+   * Encrypt a file
+   * @param {ArrayBuffer} file - file to encrypt
+   * @param {string} encryptedKey - the encrypted encryption key
+   * @return {ArrayBuffer} encrypted file
+   */
+  async encryptFile(file, encryptedKey) {
+    this.attachToGlobal()
+
+    const encryptionKey = await this.decryptEncryptionKey(encryptedKey)
+    return this.cryptoService.encryptToBytes(file, encryptionKey)
+  }
+
+  /**
+   * Decrypt a file
+   * @param {ArrayBuffer} encryptedFile - encrypted file
+   * @param {string} encryptedKey - the encrypted decryption key
+   * @return {ArrayBuffer} decrypted file
+   */
+  async decryptFile(encryptedFile, encryptedKey) {
+    this.attachToGlobal()
+
+    const decryptionKey = await this.decryptEncryptionKey(encryptedKey)
+    return this.cryptoService.decryptFromBytes(encryptedFile, decryptionKey)
   }
 
   /**
