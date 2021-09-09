@@ -327,4 +327,25 @@ describe('WebVaultClient', () => {
       })
     })
   })
+
+  describe('computeMasterKey', () => {
+    const client = new WebVaultClient('https://me.cozy.wtf')
+
+    jest.spyOn(client.cryptoService, 'makeKey').mockImplementation(() => {})
+
+    afterEach(() => {
+      client.cryptoService.makeKey.mockReset()
+    })
+
+    it('should call cryptoService.makeKey', async () => {
+      await client.computeMasterKey('SOME_PASSWORD', 123456, 0)
+
+      expect(client.cryptoService.makeKey).toHaveBeenCalledWith(
+        'SOME_PASSWORD',
+        'me@me.cozy.wtf',
+        0,
+        123456
+      )
+    })
+  })
 })

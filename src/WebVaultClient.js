@@ -463,15 +463,12 @@ class WebVaultClient {
    * @return {string} hashed password for login
    */
   async computeMasterKey(masterPassword, iterations, kdf) {
-    // clone the authService to avoid messing
-    // with the requested kdf and kdf iterations if provided
-    let authService = iterations
-      ? this.authService
-      : Object.assign(Object.create(this.authService), this.authService, {
-          kdfIterations: iterations,
-          kdf: kdf || KdfType.PBKDF2_SHA256
-        })
-    return await authService.makePreloginKey(masterPassword, this.email)
+    return await this.cryptoService.makeKey(
+      masterPassword,
+      this.email,
+      kdf || KdfType.PBKDF2_SHA256,
+      iterations
+    )
   }
 
   /**
