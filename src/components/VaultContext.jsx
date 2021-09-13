@@ -15,7 +15,7 @@ class VaultProvider extends React.Component {
     super(props)
 
     this.state = {
-      client: null,
+      client: this.props.client,
       locked: true
     }
 
@@ -24,9 +24,7 @@ class VaultProvider extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.instance) {
-      this.setupClient()
-    }
+    this.setupClient()
   }
 
   componentWillUnmount() {
@@ -49,12 +47,9 @@ class VaultProvider extends React.Component {
 
   setupClient() {
     const unsafeStorage = this.props.unsafeStorage
-
-    const client = getVaultClient(
-      this.props.instance,
-      unsafeStorage,
-      this.props.vaultData
-    )
+    const client =
+      this.props.client ||
+      getVaultClient(this.props.instance, unsafeStorage, this.props.vaultData)
 
     this.setState(
       {
@@ -86,7 +81,8 @@ class VaultProvider extends React.Component {
 }
 
 VaultProvider.propTypes = {
-  instance: PropTypes.string.isRequired,
+  instance: PropTypes.string,
+  client: PropTypes.object,
   unsafeStorage: PropTypes.bool,
   setClient: PropTypes.func
 }
