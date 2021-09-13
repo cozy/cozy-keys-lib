@@ -94,11 +94,12 @@ class WebVaultClient {
    * @param {string} options.urls.identity - URL of the identity server
    * @param {string} options.urls.api - URL of the api server
    * @param {string} options.urls.events - URL of the events server
+   * @param {boolean} options.isPassContext - Whether or not this is used in a Pass context
    * @param {VaultData} vaultData - optional Vault related services that may be injected
    */
   constructor(
     instance_or_email,
-    { urls, locale, unsafeStorage } = {},
+    { urls, locale, unsafeStorage, isPassContext = true } = {},
     vaultData = undefined
   ) {
     this.instance = instance_or_email
@@ -113,6 +114,7 @@ class WebVaultClient {
     }
 
     this.locale = locale || 'en'
+    this.isPassContext = isPassContext
     this.init({ unsafeStorage }, vaultData)
   }
 

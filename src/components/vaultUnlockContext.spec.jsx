@@ -59,7 +59,8 @@ describe('vault unlock context', () => {
 
   it('should not show unlock form and call onUnlock if extension is not installed', async () => {
     useVaultClient.mockReturnValue({
-      isLocked: jest.fn().mockResolvedValue(true)
+      isLocked: jest.fn().mockResolvedValue(true),
+      isPassContext: true
     })
     checkHasInstalledExtension.mockResolvedValue(false)
     const { root, onUnlock } = await setup()
@@ -69,7 +70,8 @@ describe('vault unlock context', () => {
 
   it('should not show unlock form and call onUnlock if vault is unlocked', async () => {
     useVaultClient.mockReturnValue({
-      isLocked: jest.fn().mockResolvedValue(false)
+      isLocked: jest.fn().mockResolvedValue(false),
+      isPassContext: true
     })
     checkHasInstalledExtension.mockResolvedValue(true)
     const { root, onUnlock } = await setup()
