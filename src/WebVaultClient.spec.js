@@ -3,6 +3,7 @@ import { Utils } from './@bitwarden/jslib/misc/utils'
 import fs from 'fs'
 import path from 'path'
 import range from 'lodash/range'
+import { SymmetricCryptoKey } from './@bitwarden/jslib/models/domain/symmetricCryptoKey'
 
 jest.spyOn(Utils, 'init').mockImplementation(() => {})
 
@@ -346,6 +347,28 @@ describe('WebVaultClient', () => {
         0,
         123456
       )
+    })
+  })
+
+  describe('decryptEncryptionKey', () => {
+    const client = new WebVaultClient('https://me.cozy.wtf')
+    jest
+      .spyOn(client.cryptoService, 'decryptToBytes')
+      .mockResolvedValue(new ArrayBuffer(64))
+    jest
+      .spyOn(client, 'getEncryptionKey')
+      .mockResolvedValue(new SymmetricCryptoKey(new ArrayBuffer(64)))
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should decrypt the given key with correct length', async () => {
+      const encryptedKey = 'xyz'
+      const key = await client.decryptEncryptionKey(encryptedKey)
+      expect(key.key.byteLength).toBe(64)
+      expect(key.encType).toBe(2)
+      expect(key.encKey.byteLength).toBe(32)
     })
   })
 })
