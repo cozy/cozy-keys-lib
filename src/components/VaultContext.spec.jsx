@@ -21,26 +21,32 @@ describe('VaultProvider', () => {
       </VaultProvider>
     )
 
-    const client = component.state('client')
+    const vaultClient = component.state('vaultClient')
 
-    expect(ChildComponent).toHaveBeenCalledWith({ client, locked: true })
+    expect(ChildComponent).toHaveBeenCalledWith({ vaultClient, locked: true })
 
-    client.unlock()
+    vaultClient.unlock()
 
     await new Promise(resolve =>
       setTimeout(() => {
         expect(ChildComponent).toHaveBeenCalledTimes(2)
-        expect(ChildComponent).toHaveBeenCalledWith({ client, locked: false })
+        expect(ChildComponent).toHaveBeenCalledWith({
+          vaultClient,
+          locked: false
+        })
         resolve()
       })
     )
 
-    client.lock()
+    vaultClient.lock()
 
     await new Promise(resolve =>
       setTimeout(() => {
         expect(ChildComponent).toHaveBeenCalledTimes(3)
-        expect(ChildComponent).toHaveBeenCalledWith({ client, locked: true })
+        expect(ChildComponent).toHaveBeenCalledWith({
+          vaultClient,
+          locked: true
+        })
         resolve()
       })
     )

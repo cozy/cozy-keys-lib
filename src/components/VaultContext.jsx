@@ -15,7 +15,7 @@ class VaultProvider extends React.Component {
     super(props)
 
     this.state = {
-      client: this.props.client,
+      vaultClient: this.props.vaultClient,
       locked: true
     }
 
@@ -28,18 +28,18 @@ class VaultProvider extends React.Component {
   }
 
   componentWillUnmount() {
-    const { client } = this.state
-    if (!client) {
+    const { vaultClient } = this.state
+    if (!vaultClient) {
       return
     }
-    client.removeListener('unlock', this.updateLockedState)
-    client.removeListener('lock', this.updateLockedState)
-    client.removeListener('login', this.updateLockedState)
+    vaultClient.removeListener('unlock', this.updateLockedState)
+    vaultClient.removeListener('lock', this.updateLockedState)
+    vaultClient.removeListener('login', this.updateLockedState)
   }
 
   async updateLockedState() {
-    const { client } = this.state
-    const locked = await client.isLocked()
+    const { vaultClient } = this.state
+    const locked = await vaultClient.isLocked()
     if (locked != this.state.locked) {
       this.setState({ locked })
     }
@@ -47,32 +47,32 @@ class VaultProvider extends React.Component {
 
   setupClient() {
     const unsafeStorage = this.props.unsafeStorage
-    const client =
-      this.props.client ||
+    const vaultClient =
+      this.props.vaultClient ||
       getVaultClient(this.props.instance, unsafeStorage, this.props.vaultData)
 
     this.setState(
       {
-        client,
+        vaultClient,
         locked: true
       },
       () => {
-        client.on('unlock', this.updateLockedState)
-        client.on('lock', this.updateLockedState)
-        client.on('login', this.updateLockedState)
+        vaultClient.on('unlock', this.updateLockedState)
+        vaultClient.on('lock', this.updateLockedState)
+        vaultClient.on('login', this.updateLockedState)
 
         this.updateLockedState()
       }
     )
 
     if (this.props.setClient) {
-      this.props.setClient(client)
+      this.props.setClient(vaultClient)
     }
   }
 
   render() {
-    const { client } = this.state
-    return client ? (
+    const { vaultClient } = this.state
+    return vaultClient ? (
       <VaultContext.Provider value={this.state}>
         {this.props.children}
       </VaultContext.Provider>
@@ -82,7 +82,7 @@ class VaultProvider extends React.Component {
 
 VaultProvider.propTypes = {
   instance: PropTypes.string,
-  client: PropTypes.object,
+  vaultClient: PropTypes.object,
   unsafeStorage: PropTypes.bool,
   setClient: PropTypes.func
 }
@@ -90,7 +90,9 @@ VaultProvider.propTypes = {
 const withVaultClient = BaseComponent => {
   const Component = props => (
     <VaultContext.Consumer>
-      {({ client }) => <BaseComponent vaultClient={client} {...props} />}
+      {({ vaultClient }) => (
+        <BaseComponent vaultClient={vaultClient} {...props} />
+      )}
     </VaultContext.Consumer>
   )
 
@@ -102,7 +104,7 @@ const withVaultClient = BaseComponent => {
 
 const useVaultClient = () => {
   const ctx = useContext(VaultContext)
-  return ctx.client
+  return ctx.vaultClient
 }
 
 export { VaultContext, VaultProvider, withVaultClient, useVaultClient }
