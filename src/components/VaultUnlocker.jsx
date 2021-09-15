@@ -27,7 +27,7 @@ const VaultUnlocker = ({
   checkShouldUnlock
 }) => {
   const cozyClient = useClient()
-  const { locked, client: vaultClient } = useContext(VaultContext)
+  const { locked, vaultClient } = useContext(VaultContext)
 
   const [showSpinner, setShowSpinner] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
