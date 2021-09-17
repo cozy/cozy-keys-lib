@@ -14,8 +14,16 @@ class VaultProvider extends React.Component {
   constructor(props) {
     super(props)
 
+    let vaultClient = this.props.vaultClient
+    if (this.props.client) {
+      vaultClient = this.props.client
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Passing client in props is deprecated, please use vaultClient instead.'
+      )
+    }
     this.state = {
-      vaultClient: this.props.vaultClient,
+      vaultClient: vaultClient,
       locked: true
     }
 
@@ -83,6 +91,7 @@ class VaultProvider extends React.Component {
 VaultProvider.propTypes = {
   instance: PropTypes.string,
   vaultClient: PropTypes.object,
+  client: PropTypes.object, // deprecated
   unsafeStorage: PropTypes.bool,
   setClient: PropTypes.func
 }
