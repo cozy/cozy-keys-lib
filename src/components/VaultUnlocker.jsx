@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
 import Overlay from 'cozy-ui/transpiled/react/Overlay'
 import withLocales from 'cozy-ui/transpiled/react/I18n/withLocales'
-import { useClient } from 'cozy-client'
 
 import localesEn from '../locales/en.json'
 import localesFr from '../locales/fr.json'
@@ -24,9 +23,8 @@ const VaultUnlocker = ({
   closable,
   onUnlock,
   UnlockForm,
-  checkShouldUnlock
+  addCheckShouldUnlock
 }) => {
-  const cozyClient = useClient()
   const { locked, vaultClient } = useContext(VaultContext)
 
   const [showSpinner, setShowSpinner] = useState(false)
@@ -42,7 +40,10 @@ const VaultUnlocker = ({
 
   useEffect(() => {
     const doCheckShouldUnlock = async () => {
-      const shouldUnlock = await checkShouldUnlock(vaultClient, cozyClient)
+      const shouldUnlock = await checkShouldUnlock(
+        vaultClient,
+        addCheckShouldUnlock
+      )
 
       setShouldUnlock(shouldUnlock)
       setIsChecking(false)
@@ -75,12 +76,12 @@ const VaultUnlocker = ({
 VaultUnlocker.propTypes = {
   onDismiss: PropTypes.func.isRequired,
   closable: PropTypes.bool,
-  onUnlock: PropTypes.func.isRequired
+  onUnlock: PropTypes.func.isRequired,
+  addCheckShouldUnlock: PropTypes.func
 }
 
 VaultUnlocker.defaultProps = {
-  UnlockForm,
-  checkShouldUnlock: checkShouldUnlock
+  UnlockForm
 }
 
 export default withLocales(locales)(VaultUnlocker)

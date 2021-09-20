@@ -4,15 +4,10 @@ import {
   VaultUnlockProvider,
   useVaultUnlockContext
 } from './vaultUnlockContext'
-import { checkHasInstalledExtension } from '../CozyUtils'
 import { useVaultClient } from './VaultContext'
 
 jest.mock('./VaultContext', () => ({
   useVaultClient: jest.fn()
-}))
-
-jest.mock('../CozyUtils', () => ({
-  checkHasInstalledExtension: jest.fn()
 }))
 
 describe('vault unlock context', () => {
@@ -51,27 +46,15 @@ describe('vault unlock context', () => {
     useVaultClient.mockReturnValue({
       isLocked: jest.fn().mockResolvedValue(true)
     })
-    checkHasInstalledExtension.mockResolvedValue(true)
     const { root, onUnlock } = await setup()
     root.getByText('showingUnlockForm: true')
     expect(onUnlock).not.toHaveBeenCalled()
-  })
-
-  it('should not show unlock form and call onUnlock if extension is not installed', async () => {
-    useVaultClient.mockReturnValue({
-      isLocked: jest.fn().mockResolvedValue(true)
-    })
-    checkHasInstalledExtension.mockResolvedValue(false)
-    const { root, onUnlock } = await setup()
-    expect(root.getByText('showingUnlockForm: false')).toBeTruthy()
-    expect(onUnlock).toHaveBeenCalled()
   })
 
   it('should not show unlock form and call onUnlock if vault is unlocked', async () => {
     useVaultClient.mockReturnValue({
       isLocked: jest.fn().mockResolvedValue(false)
     })
-    checkHasInstalledExtension.mockResolvedValue(true)
     const { root, onUnlock } = await setup()
     expect(root.getByText('showingUnlockForm: false')).toBeTruthy()
     expect(onUnlock).toHaveBeenCalled()
