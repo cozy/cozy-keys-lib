@@ -57,6 +57,7 @@ class VaultProvider extends React.Component {
     const unsafeStorage = this.props.unsafeStorage
     const vaultClient =
       this.props.vaultClient ||
+      this.props.client ||
       getVaultClient(this.props.instance, unsafeStorage, this.props.vaultData)
 
     this.setState(
