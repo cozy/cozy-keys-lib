@@ -32,7 +32,18 @@ class VaultProvider extends React.Component {
   }
 
   componentDidMount() {
-    this.setupClient()
+    const { cozyClient, instance } = this.props
+    if (cozyClient) {
+      const uri = cozyClient.getStackClient().uri
+      if (!uri) {
+        cozyClient.on('login', () => {
+          this.setupClient(cozyClient.getStackClient().uri)
+        })
+      }
+    }
+    if (instance) {
+      this.setupClient(this.props.instance)
+    }
   }
 
   componentWillUnmount() {
@@ -53,12 +64,12 @@ class VaultProvider extends React.Component {
     }
   }
 
-  setupClient() {
+  setupClient(instance) {
     const unsafeStorage = this.props.unsafeStorage
     const vaultClient =
       this.props.vaultClient ||
       this.props.client ||
-      getVaultClient(this.props.instance, unsafeStorage, this.props.vaultData)
+      getVaultClient(instance, unsafeStorage, this.props.vaultData)
 
     this.setState(
       {
@@ -80,12 +91,11 @@ class VaultProvider extends React.Component {
   }
 
   render() {
-    const { vaultClient } = this.state
-    return vaultClient ? (
+    return (
       <VaultContext.Provider value={this.state}>
         {this.props.children}
       </VaultContext.Provider>
-    ) : null
+    )
   }
 }
 
@@ -94,7 +104,8 @@ VaultProvider.propTypes = {
   vaultClient: PropTypes.object,
   client: PropTypes.object, // deprecated
   unsafeStorage: PropTypes.bool,
-  setClient: PropTypes.func
+  setClient: PropTypes.func,
+  cozyClient: PropTypes.object
 }
 
 const withVaultClient = BaseComponent => {

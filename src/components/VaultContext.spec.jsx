@@ -29,7 +29,7 @@ describe('VaultProvider', () => {
 
     await new Promise(resolve =>
       setTimeout(() => {
-        expect(ChildComponent).toHaveBeenCalledTimes(2)
+        expect(ChildComponent).toHaveBeenCalledTimes(3)
         expect(ChildComponent).toHaveBeenCalledWith({
           vaultClient,
           locked: false
@@ -42,7 +42,7 @@ describe('VaultProvider', () => {
 
     await new Promise(resolve =>
       setTimeout(() => {
-        expect(ChildComponent).toHaveBeenCalledTimes(3)
+        expect(ChildComponent).toHaveBeenCalledTimes(4)
         expect(ChildComponent).toHaveBeenCalledWith({
           vaultClient,
           locked: true
