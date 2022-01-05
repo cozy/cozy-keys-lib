@@ -18,4 +18,3 @@ export {
   VaultUnlockProvider,
   withVaultUnlockContext
 } from './components/vaultUnlockContext'
-export { UnlockForm } from './components/UnlockForm'
