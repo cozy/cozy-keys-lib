@@ -39,6 +39,8 @@ class VaultProvider extends React.Component {
         cozyClient.on('login', () => {
           this.setupClient(cozyClient.getStackClient().uri)
         })
+      } else {
+        this.setupClient(uri)
       }
     }
     if (instance) {
