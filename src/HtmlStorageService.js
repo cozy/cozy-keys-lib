@@ -18,7 +18,15 @@ export default class HtmlStorageService {
     'enableGravatars',
     ConstantsService.localeKey,
     ConstantsService.lockOptionKey,
-    ConstantsService.autoConfirmFingerprints
+    ConstantsService.autoConfirmFingerprints,
+    'kdf',
+    'kdfIterations',
+    'key',
+    'keyHash',
+    'encKey',
+    'encPrivateKey',
+    'accessToken',
+    'refreshToken'
   ])
   localStorageStartsWithKeys = [
     'twoFactorToken_',
