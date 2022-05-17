@@ -127,6 +127,10 @@ const withVaultClient = BaseComponent => {
 
 const useVaultClient = () => {
   const ctx = useContext(VaultContext)
+
+  if (!ctx) {
+    throw new Error('useVaultClient must be used within a VaultProvider')
+  }
   return ctx.vaultClient
 }
 
