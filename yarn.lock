@@ -4035,6 +4035,13 @@ cozy-flags@2.6.0:
   dependencies:
     microee "^0.0.6"
 
+cozy-intent@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/cozy-intent/-/cozy-intent-2.0.2.tgz#81330389c7b8cfc1433608a435873b362691931c"
+  integrity sha512-E+9WqbYhFiV/KCGFArSJu/jcvdliI58Vfa3ajrJFRV2AsPtej6wN5qfn6Wex53xpdTAZSjLfmYAQLNt0cl6xGw==
+  dependencies:
+    post-me "0.4.5"
+
 cozy-interapp@0.5.4:
   version "0.5.4"
   resolved "https://registry.yarnpkg.com/cozy-interapp/-/cozy-interapp-0.5.4.tgz#2573f1800f073c84c289267d04234954d88eae0c"
@@ -8840,6 +8847,11 @@ posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
+
+post-me@0.4.5:
+  version "0.4.5"
+  resolved "https://registry.yarnpkg.com/post-me/-/post-me-0.4.5.tgz#6171b721c7b86230c51cfbe48ddea047ef8831ce"
+  integrity sha512-XgPdktF/2M5jglgVDULr9NUb/QNv3bY3g6RG22iTb5MIMtB07/5FJB5fbVmu5Eaopowc6uZx7K3e7x1shPwnXw==
 
 prelude-ls@~1.1.2:
   version "1.1.2"

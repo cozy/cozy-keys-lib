@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import cx from 'classnames'
 import get from 'lodash/get'
 import PropTypes from 'prop-types'
@@ -13,6 +13,7 @@ import Icon from 'cozy-ui/transpiled/react/Icon'
 import CozyTheme from 'cozy-ui/transpiled/react/CozyTheme'
 import { IllustrationDialog } from 'cozy-ui/transpiled/react/CozyDialogs'
 import KeychainIcon from 'cozy-ui/transpiled/react/Icons/Keychain'
+import { useWebviewIntent } from 'cozy-intent'
 
 import CloudIcon from './IconCozySecurity'
 import PasswordField from './PasswordField'
@@ -76,6 +77,31 @@ const UnlockForm = props => {
   ])
 
   const canAuthWithOIDC = canClientAuthWithOIDC(client)
+
+  const webviewIntent = useWebviewIntent()
+
+  useEffect(() => {
+    webviewIntent &&
+      webviewIntent.call(
+        'setFlagshipUI',
+        {
+          bottomTheme: 'light',
+          topTheme: 'light'
+        },
+        'cozy-keys-lib/UnlockForm'
+      )
+
+    return () =>
+      webviewIntent &&
+      webviewIntent.call(
+        'setFlagshipUI',
+        {
+          bottomTheme: 'light',
+          topTheme: 'light'
+        },
+        'cozy-keys-lib/UnlockForm'
+      )
+  }, [webviewIntent])
 
   return (
     <CozyTheme variant="inverted">
