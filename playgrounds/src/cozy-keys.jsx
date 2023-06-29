@@ -5,7 +5,7 @@ import { createStore, combineReducers } from 'redux'
 import App from './common/App'
 import client from './common/client'
 import 'cozy-ui/transpiled/react/stylesheet.css'
-import { Sprite } from 'cozy-ui/transpiled/react/Icon'
+import Sprite from 'cozy-ui/transpiled/react/Icon/Sprite'
 import { withClient } from 'cozy-client'
 
 import { VaultProvider, VaultUnlocker } from '../../transpiled'
