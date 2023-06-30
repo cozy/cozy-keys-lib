@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import TextField from 'cozy-ui/transpiled/react/MuiCozyTheme/TextField'
+import TextField from 'cozy-ui/transpiled/react/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import { useI18n } from 'cozy-ui/transpiled/react/I18n'
 import Icon from 'cozy-ui/transpiled/react/Icon'
 import EyeIcon from 'cozy-ui/transpiled/react/Icons/Eye'
 import EyeClosedIcon from 'cozy-ui/transpiled/react/Icons/EyeClosed'
-import MuiButton from 'cozy-ui/transpiled/react/MuiCozyTheme/Buttons'
+import MuiButton from 'cozy-ui/transpiled/react/Button'
 
 const EyeAdornment = props => {
   const { hidden, ...rest } = props

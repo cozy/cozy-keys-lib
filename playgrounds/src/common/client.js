@@ -44,7 +44,8 @@ const getClient = customOptions => {
           clientName: 'Example App',
           softwareID: 'io.cozy.example',
           redirectURI: 'http://localhost:1234/auth'
-        }
+        },
+        store: false
       },
       customOptions
     )
