@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import TextField from 'cozy-ui/transpiled/react/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { useI18n } from 'cozy-ui/transpiled/react/I18n'
+import { useI18n } from 'cozy-ui/transpiled/react/providers/I18n'
 import Icon from 'cozy-ui/transpiled/react/Icon'
 import EyeIcon from 'cozy-ui/transpiled/react/Icons/Eye'
 import EyeClosedIcon from 'cozy-ui/transpiled/react/Icons/EyeClosed'
