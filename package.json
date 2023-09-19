@@ -49,7 +49,7 @@
     "babel-plugin-mock-imports": "^1.0.2",
     "babel-plugin-rewire": "1.2.0",
     "babel-preset-cozy-app": "^1.6.0",
-    "cozy-client": "^38.8.0",
+    "cozy-client": "^40.5.0",
     "cozy-flags": "2.8.6",
     "cozy-intent": "^2.0.2",
     "cozy-ui": "^88.1.0",
@@ -86,7 +86,7 @@
     "zxcvbn": "^4.4.2"
   },
   "peerDependencies": {
-    "cozy-client": "^38.8.0",
+    "cozy-client": "^40.5.0",
     "cozy-flags": "^2.8.6",
     "cozy-intent": "^2.0.2",
     "cozy-ui": "^88.1.0",
