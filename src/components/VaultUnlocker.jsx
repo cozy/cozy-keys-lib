@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import Spinner from 'cozy-ui/transpiled/react/Spinner'
 import Overlay from 'cozy-ui/transpiled/react/deprecated/Overlay'
-import withLocales from 'cozy-ui/transpiled/react/I18n/withLocales'
+import withLocales from 'cozy-ui/transpiled/react/providers/I18n/withLocales'
 
 import localesEn from '../locales/en.json'
 import localesFr from '../locales/fr.json'
