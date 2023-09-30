@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@babel/runtime": "7.17.8",
-    "babel-polyfill": "^6.26.0",
-    "parcel": "^1.12.3"
+    "babel-polyfill": "6.26.0",
+    "parcel": "1.12.3"
   }
 }
