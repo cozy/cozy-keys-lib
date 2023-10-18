@@ -118,6 +118,7 @@ class WebVaultClient {
 
     this.locale = locale || 'en'
     this.init({ unsafeStorage }, vaultData)
+
   }
 
   createServices(unsafeStorage) {
@@ -276,7 +277,13 @@ class WebVaultClient {
 
     this.attachToGlobal()
     this.initFinished = this.environmentService.setUrls(this.urls)
-    this.initFinished.then(() => this.emit('init', this))
+    this.initFinished.then(() => {
+      this.emit('init', this)
+      if(this.cryptoService.getKey()){
+        this.unlockFromLocalStorage()
+      }
+    }
+    )
   }
 
   initPlatformUtilsService(i18nService, messagingService) {
@@ -571,6 +578,11 @@ class WebVaultClient {
     return true
   }
 
+  unlockFromLocalStorage(){
+    this.sync()
+    this.emit('unlock', this)
+    return true
+  }
   /**
    * Download new data from the bitwarden server
    *
