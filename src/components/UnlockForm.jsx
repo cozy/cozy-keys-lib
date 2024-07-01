@@ -117,7 +117,7 @@ const UnlockForm = props => {
             {canAuthWithOIDC ? (
               <Icon icon={KeychainIcon} size={64} className="u-mb-half" />
             ) : (
-              <CloudIcon className="u-mb-half" />
+              <CloudIcon className="u-mb-half" size={104} />
             )}
             <Typography variant="h3" gutterBottom>
               {canAuthWithOIDC ? t('unlock.title-oidc') : t('unlock.title')}
