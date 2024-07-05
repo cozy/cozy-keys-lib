@@ -3906,7 +3906,7 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
-cozy-client@^40.5.0:
+cozy-client@40.5.0:
   version "40.5.0"
   resolved "https://registry.yarnpkg.com/cozy-client/-/cozy-client-40.5.0.tgz#346befd54dc6b3f29666f08bd21c8d9c9fdc5b0a"
   integrity sha512-A23sP7gX44yATPfr97mVMWkjw/2pIcgaNslVLo9QPc8cpb5RovctXYBKFAwTYnAxytFhhiHUDcqw843zpaSlUQ==
