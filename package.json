@@ -60,7 +60,7 @@
     "jest": "26.2.2",
     "react": "16.14.0",
     "react-dom": "16.14.0",
-    "semantic-release": "^15.13.24"
+    "semantic-release": "^17.0.0"
   },
   "files": [
     "src",
