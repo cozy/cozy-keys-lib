@@ -1,15 +1,1 @@
-{
-  "unlock": {
-    "title": "Login",
-    "title-oidc": "Cozy Pass",
-    "subtitle": "For security, please confirm your identity",
-    "error": "Incorrect password",
-    "label": "Cozy password",
-    "label-oidc": "Cozy Pass password",
-    "show": "show",
-    "hide": "hide",
-    "abort": "Leave",
-    "unlock": "Unlock",
-    "forgotten-password": "I forgot my password"
-  }
-}
+{}

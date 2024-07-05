@@ -1,11 +1,12 @@
 import React from 'react'
-import UnlockForm from './UnlockForm'
-import { render, fireEvent, act, waitFor } from '@testing-library/react'
+import { render, fireEvent, act, waitFor, screen } from '@testing-library/react'
+
 import CozyClient, { CozyProvider } from 'cozy-client'
-import { BreakpointsProvider } from 'cozy-ui/transpiled/react/providers/Breakpoints'
 import I18n from 'cozy-ui/transpiled/react/providers/I18n'
+import { BreakpointsProvider } from 'cozy-ui/transpiled/react/providers/Breakpoints'
+
 import { VaultProvider, useVaultClient } from './VaultContext'
-import en from '../locales/en.json'
+import UnlockForm from './UnlockForm'
 
 jest.mock('./VaultContext', () => {
   const { VaultProvider } = jest.requireActual('./VaultContext')
@@ -27,20 +28,22 @@ describe('unlock form', () => {
     const root = render(
       <CozyProvider client={client}>
         <BreakpointsProvider>
-          <I18n dictRequire={() => en} lang="en">
-            <VaultProvider instance="cozy.tools:8080">
+          <VaultProvider instance="cozy.tools:8080">
+            <I18n dictRequire={() => ({})} lang="en">
               <UnlockForm
                 closable={true}
                 onDismiss={jest.fn()}
                 onUnlock={onUnlock}
               />
-            </VaultProvider>
-          </I18n>
+            </I18n>
+          </VaultProvider>
         </BreakpointsProvider>
       </CozyProvider>
     )
 
-    const password = await waitFor(() => root.getByTestId('password'))
+    const password = await waitFor(() =>
+      screen.getByLabelText(/password/i, { selector: 'input' })
+    )
     await act(async () => {
       fireEvent.change(password, { target: { value: 'my-password' } })
     })
