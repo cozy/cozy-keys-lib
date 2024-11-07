@@ -43,7 +43,7 @@
     "@semantic-release/git": "7.0.18",
     "@semantic-release/npm": "5.3.5",
     "@testing-library/react": "11.2.7",
-    "@testing-library/react-hooks": "3.7.0",
+    "@testing-library/react-hooks": "8.0.1",
     "babel-loader": "8.2.4",
     "babel-plugin-inline-react-svg": "1.1.2",
     "babel-plugin-mock-imports": "1.2.0",
@@ -53,13 +53,11 @@
     "cozy-flags": "2.8.6",
     "cozy-intent": "2.13.1",
     "cozy-ui": "93.1.1",
-    "enzyme": "3.11.0",
-    "enzyme-adapter-react-16": "1.15.7",
-    "enzyme-to-json": "3.4.0",
     "eslint-config-cozy-app": "1.6.0",
     "jest": "26.2.2",
     "react": "16.14.0",
     "react-dom": "16.14.0",
+    "react-test-renderer": "16.14.0",
     "semantic-release": "^15.13.24"
   },
   "files": [

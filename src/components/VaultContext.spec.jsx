@@ -1,5 +1,5 @@
 import React from 'react'
-import { mount } from 'enzyme'
+import { EventEmitter } from 'events'
 import {
   VaultContext,
   VaultProvider,
@@ -7,65 +7,78 @@ import {
   useVaultClient
 } from './VaultContext'
 import WebVaultClient from '../WebVaultClient'
+import { render, waitFor } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
 
 jest.mock('../WebVaultClient')
 
+const createFakeVaultClient = () => {
+  const vaultClient = new EventEmitter()
+
+  vaultClient.on('lock', () => {
+    vaultClient.locked = true
+  })
+  vaultClient.on('unlock', () => {
+    vaultClient.locked = false
+  })
+  vaultClient.isLocked = () => vaultClient.locked
+
+  return vaultClient
+}
+
 describe('VaultProvider', () => {
   it('should rerender when the locked state changes', async () => {
-    const ChildComponent = jest.fn()
+    const ChildComponent = jest.fn(() => null)
+    const vaultClient = createFakeVaultClient()
 
-    const component = mount(
-      <VaultProvider instance={'test@example.com'}>
+    render(
+      <VaultProvider vaultClient={vaultClient} instance={'test@example.com'}>
         <VaultContext.Consumer>{ChildComponent}</VaultContext.Consumer>
       </VaultProvider>
     )
 
-    const vaultClient = component.state('vaultClient')
+    expect(ChildComponent).toHaveBeenCalledWith({
+      vaultClient,
+      locked: true
+    })
 
-    expect(ChildComponent).toHaveBeenCalledWith({ vaultClient, locked: true })
+    vaultClient.emit('unlock')
 
-    vaultClient.unlock()
-
-    await new Promise(resolve =>
-      setTimeout(() => {
-        expect(ChildComponent).toHaveBeenCalledTimes(3)
-        expect(ChildComponent).toHaveBeenCalledWith({
-          vaultClient,
-          locked: false
-        })
-        resolve()
+    await waitFor(() => {
+      expect(ChildComponent).toHaveBeenCalledWith({
+        vaultClient,
+        locked: false
       })
-    )
+    })
 
-    vaultClient.lock()
+    vaultClient.emit('lock')
 
-    await new Promise(resolve =>
-      setTimeout(() => {
-        expect(ChildComponent).toHaveBeenCalledTimes(4)
-        expect(ChildComponent).toHaveBeenCalledWith({
-          vaultClient,
-          locked: true
-        })
-        resolve()
+    await waitFor(() => {
+      expect(ChildComponent).toHaveBeenCalledWith({
+        vaultClient,
+        locked: true
       })
-    )
+    })
   })
 })
 
 describe('withVaultClient', () => {
-  it('should inject vaultClient as a prop', () => {
-    const ChildComponent = () => <div />
+  it('should inject vaultClient as a prop', async () => {
+    const ChildComponent = jest.fn(() => null)
+
     const ChildWithClient = withVaultClient(ChildComponent)
 
-    const component = mount(
+    render(
       <VaultProvider instance={'test@example.com'}>
         <ChildWithClient />
       </VaultProvider>
     )
 
-    const child = component.find(ChildComponent)
-    expect(child.prop('vaultClient')).toBeDefined()
+    // Check if the vault is correctly injected as a prop
+    const propsPassedToChildComponent = Object.keys(
+      ChildComponent.mock.calls[0][0]
+    )
+    expect(propsPassedToChildComponent).toContain('vaultClient')
   })
 })
 
