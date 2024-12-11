@@ -1,7 +1,6 @@
 import 'babel-polyfill'
 import React from 'react'
 
-import { hashHistory } from 'react-router'
 import 'date-fns/locale/en/index'
 
 import { CozyProvider } from 'cozy-client'
@@ -9,9 +8,7 @@ import { CozyProvider } from 'cozy-client'
 import 'cozy-ui/transpiled/react/stylesheet.css'
 import IconSprite from 'cozy-ui/transpiled/react/Icon/Sprite'
 import { Alerter, I18n } from 'cozy-ui/transpiled/react'
-import { getUniversalLinkDomain } from 'cozy-ui/transpiled/react/AppLinker'
 import icon from './icon.png'
-import { MobileRouter } from 'cozy-authentication'
 
 const styles = {
   error: {
@@ -57,29 +54,13 @@ class ErrorBoundary extends React.Component {
 /** A generic App component, meant to be used by all examples  */
 class App extends React.Component {
   render() {
-    const { title, icon, client, children, existingStore } = this.props
-    /**
-     * We need to pass a loginPath with the current locationHash to be able
-     * to stay on the right page after a refresh since cozy-authentication
-     * redirect to loginPath after the login
-     */
-
+    const { client, children, existingStore } = this.props
     return (
       <ErrorBoundary>
         <Alerter />
         <I18n dictRequire={() => ({})} lang="fr">
           <CozyProvider store={existingStore} client={client}>
-            <MobileRouter
-              history={hashHistory}
-              protocol="cozyexample://"
-              universalLinkDomain={getUniversalLinkDomain()}
-              appTitle={title}
-              appIcon={icon}
-              appSlug="example"
-              loginPath={window.location.hash.replace('#', '')}
-            >
-              {children}
-            </MobileRouter>
+            {children}
           </CozyProvider>
         </I18n>
         <IconSprite />
