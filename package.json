@@ -51,7 +51,7 @@
     "babel-preset-cozy-app": "1.12.0",
     "cozy-client": "^40.5.0",
     "cozy-flags": "2.8.6",
-    "cozy-intent": "2.13.1",
+    "cozy-intent": "2.22.0",
     "cozy-ui": "93.1.1",
     "eslint-config-cozy-app": "1.6.0",
     "jest": "26.2.2",
