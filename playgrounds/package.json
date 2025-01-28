@@ -16,7 +16,7 @@
     "react": "^16.9.0",
     "react-redux": "^7.0.3",
     "react-router": "3",
-    "redux": "3.7.2"
+    "redux": "4.2.0"
   },
   "devDependencies": {
     "@babel/runtime": "7.17.8",
