@@ -1,0 +1,56 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14.16'
+          cache: 'yarn'
+
+      - name: Install system dependencies
+        run: sudo apt-get install -y libsecret-1-dev
+
+      - name: Install Yarn
+        run: |
+          curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
+          export PATH="$HOME/.yarn/bin:$PATH"
+
+      - name: Set python v3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Setup submodules
+        run: yarn setup:submodule
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: yarn test
+
+      - name: Publish to NPM
+        if: github.ref == 'refs/heads/master'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn run semantic-release
