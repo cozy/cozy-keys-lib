@@ -3,7 +3,7 @@ import get from 'lodash/get'
 import PropTypes from 'prop-types'
 
 import flag from 'cozy-flags'
-import { AuthentificationDialog } from 'cozy-ui/transpiled/react/CozyDialogs'
+import AuthentificationDialog from 'cozy-ui-plus/dist/Dialogs/AuthentificationDialog'
 
 import { useVaultClient } from './VaultContext'
 import { useClient } from 'cozy-client'
