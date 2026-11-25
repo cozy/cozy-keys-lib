@@ -6,6 +6,14 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Never cancel a run on master, it may be publishing.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -49,9 +57,57 @@ jobs:
       - name: Test
         run: yarn test
 
-      - name: Publish to NPM
-        if: github.ref == 'refs/heads/master'
+      # The generated folders of the `files` field of package.json: the release
+      # job publishes them without building.
+      - name: Upload the built package
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: built-package
+          path: |
+            transpiled
+            src/@bitwarden
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    name: Publish
+    needs: build
+    # No GitHub environment: the plan of the cozy organization has none.
+    # The trusted publisher on npmjs.com is declared without an environment.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # the tag and the GitHub release
+      issues: write # the comment on the released issues
+      pull-requests: write # the comment on the released pull requests
+      id-token: write # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # semantic-release reads the tags and the commits since the last release
+
+      # The library builds on Node.js 14, semantic-release needs a recent one:
+      # it has its own package and lockfile in .github/release
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Download the built package
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: built-package
+
+      - name: Install semantic-release
+        working-directory: .github/release
+        run: npm ci --ignore-scripts
+
+      - name: Publish to npm
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn run semantic-release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The npm locked with semantic-release comes first: it is the one that publishes
+          export PATH="$PWD/.github/release/node_modules/.bin:$PATH"
+          semantic-release
