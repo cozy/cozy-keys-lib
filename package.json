@@ -17,8 +17,7 @@
     "watch": "yarn watch:keys",
     "watch:keys": "yarn build:keys --watch",
     "lint": "eslint 'src/**/*.{js,jsx}' 'playgrounds/src/**/*.{js,jsx}'",
-    "test": "NODE_OPTIONS=\"--max-old-space-size=8192\" jest",
-    "semantic-release": "semantic-release"
+    "test": "NODE_OPTIONS=\"--max-old-space-size=8192\" jest"
   },
   "repository": {
     "type": "git",
@@ -39,9 +38,6 @@
     "@babel/preset-env": "7.16.11",
     "@babel/runtime": "7.17.8",
     "@material-ui/core": "3.9.4",
-    "@semantic-release/changelog": "3.0.6",
-    "@semantic-release/git": "7.0.18",
-    "@semantic-release/npm": "5.3.5",
     "@testing-library/react": "11.2.7",
     "@testing-library/react-hooks": "8.0.1",
     "babel-loader": "8.2.4",
@@ -58,8 +54,7 @@
     "jest": "26.2.2",
     "react": "16.14.0",
     "react-dom": "16.14.0",
-    "react-test-renderer": "16.14.0",
-    "semantic-release": "^15.13.24"
+    "react-test-renderer": "16.14.0"
   },
   "files": [
     "src",

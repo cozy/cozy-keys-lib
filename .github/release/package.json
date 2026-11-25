@@ -1,0 +1,12 @@
+{
+  "name": "cozy-keys-lib-release",
+  "private": true,
+  "description": "Release tooling of cozy-keys-lib, kept apart from the library: it needs a recent Node.js",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "semantic-release": "25.0.9"
+  },
+  "engines": {
+    "node": ">=24.10"
+  }
+}
